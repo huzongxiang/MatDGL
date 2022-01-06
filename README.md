@@ -158,7 +158,7 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
       dataset.save_datasets(strurtures, labels)
 ```
 
-<a name="CrysNet Framework"></a>
+<a name="Framework"></a>
 ## Framework
 CrysNet 
 
