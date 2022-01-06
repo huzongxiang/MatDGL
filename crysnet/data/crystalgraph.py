@@ -450,7 +450,7 @@ class  GraphBatchGeneratorSequence(Sequence):
                 local_env_list: List[np.ndarray],
                 state_attrs_list: List[np.ndarray],
                 pair_indices_list: List[np.ndarray],
-                labels: List,
+                labels: Union[List, None],
                 task_type,
                 batch_size=32,
                 is_shuffle=False):
@@ -472,7 +472,7 @@ class  GraphBatchGeneratorSequence(Sequence):
 
         """
         self.task_type = task_type
-        self.data_size = len(labels)
+        self.data_size = len(atom_features_list)
         self.batch_size = batch_size
         self.total_index = np.arange(self.data_size)
 
@@ -518,6 +518,8 @@ class  GraphBatchGeneratorSequence(Sequence):
                         )
 
         x_batch = self._merge_batch(inputs_batch)
+        if self.labels is None:
+            return x_batch
         y_batch = np.array(get(self.labels))
 
         return x_batch, (y_batch)
@@ -854,4 +856,4 @@ class  GraphBatchGenerator(GraphBatchGeneratorBase):
         local_env = np.concatenate(local_env, axis=0)
     
         return (atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
-                bond_graph_indices, pair_indices_per_graph), y_batch    
+                bond_graph_indices, pair_indices_per_graph), y_batch
