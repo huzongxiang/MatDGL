@@ -450,8 +450,8 @@ class  GraphBatchGeneratorSequence(Sequence):
                 local_env_list: List[np.ndarray],
                 state_attrs_list: List[np.ndarray],
                 pair_indices_list: List[np.ndarray],
-                labels: Union[List, None],
                 task_type,
+                labels: Union[List, None]=None,
                 batch_size=32,
                 is_shuffle=False):
         """
