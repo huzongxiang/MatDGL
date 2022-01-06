@@ -17,6 +17,7 @@ setup(
     extras_require={
         'tensorflow': ['tensorflow=2.6'],
         'tensorflow with gpu': ['tensorflow-gpu=2.6'],
+        'mendeleev': ['mendeleev=0.9.0'],
     },
     packages=find_packages(),
     package_data={
