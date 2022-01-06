@@ -52,7 +52,7 @@ CrysNet can be installed easily through anaconda! As follows:
 
 <a name="Usage"></a>
 ## Usage
-### fast testing soon
+### Fast testing soon
 CrysNet is very easy to use!  
 <font color=#00ffff> Just ***three steps*** can finish a fast test using crysnet:</font>  
 + **download test data**  
@@ -67,22 +67,24 @@ run command:
 ```
 You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in /results and /models, respectively.
 
-### trainning script
+### Understanding trainning script
 You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!   
      
-#### get datas
+##### get datas
 Get current work directory of running trainning script, the script will read datas from 'workdir/datas/' , then saves results and models to 'workdir/results/' and 'workdir/models/'
 ```python
 from pathlib import Path
 ModulePath = Path(__file__).parent.absolute() # workdir
 ```
-#### fed trainning datas
+
+##### fed trainning datas
 Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' defines regression/classification/multi-classification, 'data_path' gets path of trainning datas.
 ```python
 from crysnet.data import Dataset
-dataset = Dataset(task_type='dos_fermi', data_path=ModulePath)
+dataset = Dataset(task_type='multiclassfication', data_path=ModulePath)
 ```
-#### generator
+
+##### generator
 Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs and gets three generators.
 BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of bond distance in crystal.
 ```python
@@ -95,7 +97,8 @@ train_data = Generators.train_generator
 valid_data = Generators.valid_generator
 test_data = Generators.test_generator
 ```
-#### build model
+
+##### building model
 Module GNN defines a trainning model. TransformerModel, GraphModel and MpnnModel are different model. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel.
 ```python
 from crysnet.models import GNN
@@ -126,16 +129,35 @@ gnn = GNN(model=TransformerModel,
       optimizer = 'Adam'
       )
 ```
-### trainning
-Use trainning function of model to train. Common trainning parameters can be defined, workdir is current directory of trainning script, it saves results of model during trainning. If test_data exists, model will predict on test_data.
+
+#### trainning
+Using trainning function of model to train. Common trainning parameters can be defined, workdir is current directory of trainning script, it saves results of model during trainning. If test_data exists, model will predict on test_data.
 ```python
 gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
 <a name="CrysNet Framework"></a>
 
-### prediction
-The simplest method for predicting is using script predict.py in /train
+##### prediction
+The simplest method for predicting is using script predict.py in /user_easy_train_scripts.
+Using predict_data funciton to predict
+```python
+gnn.predict_datas(test_data, workdir=ModulePath)
+```
 
+#### preparing your custom datas
+If you have your structures (and labels), the Dataset receives pymatgen.core.Structure type. So you should transform your POSCAR or cif to pymatgen.core.Structure type.
+```python
+import os
+from pymatgen.core.structure import Structure
+structures = []
+for cif in os.listdir(cif_path):
+      structures.append(Structure.from_file(cif)) # the same as POSCAR
+
+# save your structures and labels to dataset
+from crysnet.data import Dataset
+dataset = Dataset(task_type='train', data_path=ModulePath)
+dataset.save_datasets(strurtures, labels)
+```
 
 ## Framework
 CrysNet 
