@@ -11,7 +11,7 @@
 # Installation
 
 CrysNet can be installed easily through anaconda!
-Create a new conda environment named 'crysnet' by command：\n
+Create a new conda environment named 'crysnet' by command：
       conda create -n crysnet python=3.8
 Then activate environment crysnet：
       conda activate crysnet
