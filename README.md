@@ -138,8 +138,8 @@ gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, 
 <a name="CrysNet Framework"></a>
 
 ##### prediction
-The simplest method for predicting is using script predict.py in /user_easy_train_scripts.
-Using predict_data funciton to predict
+The simplest method for predicting is using script predict.py in /user_easy_train_scripts.  
+Using predict_data funciton to predict.
 ```python
 gnn.predict_datas(test_data, workdir=ModulePath)
 ```
