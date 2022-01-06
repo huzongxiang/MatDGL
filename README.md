@@ -1,14 +1,16 @@
 # CrysNetwork
 
-# Table of Contents
+
+## Table of Contents
 * [Installation](#installation)
 * [Usage](#usage)
 * [Framework](#crysnet-framework)
 * [Contributors](#contributors)
 * [References](#references)
 
+
 <a name="Installation"></a>
-# Installation
+## Installation
 
 CrysNet can be installed easily through anaconda!
 
@@ -47,8 +49,8 @@ Install crysnet:
       
 
 <a name="Usage"></a>
-# Usage
-
+## Usage
+### do your test
 CrysNet is very easy to use!  
 Get test datas from https://github.com/huzongxiang/CrysNetwork/datas/  
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
@@ -56,13 +58,26 @@ Download datas and put it in your trainning directory, test.py file should also 
 ```bash
       python test.py  
 ```
+You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in ./results and ./models, respectively.
 
+### trainning script
+You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!
+Get current work directory of running trainning script, the script will read datas from 'workdir/datas/' , then saves results and models to 'workdir/results/' and 'workdir/models/'
+```python
+from pathlib import Path
+ModulePath = Path(__file__).parent.absolute()
+```
+Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' defines regression/classification/multi-classification, 'data_path' gets path of trainning datas.
+```python
+from crysnet.data import Dataset
+dataset = Dataset(task_type='dos_fermi', data_path=ModulePath)
+```
 
 <a name="CrysNet Framework"></a>
-# Framework
+## Framework
 CrysNet 
 
 
 <a name="Contributors"></a>
-# Contributors
+## Contributors
 Zongxiang Hu
