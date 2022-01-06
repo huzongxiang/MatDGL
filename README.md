@@ -1,9 +1,9 @@
 # CrysNetwork
 
 # Table of Contents
-* [MEGNet Framework](#megnet-framework)
 * [Installation](#installation)
 * [Usage](#usage)
+* [CrysNet Framework](#crysnet-framework)
 * [Contributors](#contributors)
 * [References](#references)
 
@@ -56,6 +56,12 @@ Download datas and put it in your trainning directory, test.py file should also 
 ```bash
       python test.py  
 ```
+
+
+<a name="CrysNet Framework"></a>
+# CrysNet Framework
+CrysNet 
+
 
 <a name="Contributors"></a>
 # Contributors
