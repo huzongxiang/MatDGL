@@ -83,14 +83,18 @@ class Dataset:
         if self.dataset_file.exists():    
             with open(self.dataset_file, 'r') as f:
                 entries = json.load(f)
-            self.structures = [Structure.from_dict(s[0]) for s in entries]
-            self.labels = [s[1] for s in entries]
-            self.dataset = zip(self.structures, self.labels)
-            self.permuted_indices = self._permute_indices(self.labels)
-            self.datasize = len(self.labels)
-        else:
-            print('ModulePath: ', data_path)
-
+            if isinstance(entries[0], tuple):
+                self.structures = [Structure.from_dict(s[0]) for s in entries]
+                self.labels = [s[1] for s in entries]
+                self.dataset = zip(self.structures, self.labels)
+                self.permuted_indices = self._permute_indices(self.labels)
+                self.datasize = len(self.labels)
+            else:
+                self.structures = [Structure.from_dict(s) for s in entries]
+                self.labels = None
+                self.dataset = self.structures
+                self.permuted_indices = self._permute_indices(self.structures)
+                self.datasize = len(self.structures)
         if api_key is not None:
             self.mpr = MPRester(api_key)
 
@@ -131,7 +135,7 @@ class Dataset:
         return structures, labels
 
 
-    def save_datasets(self, structures: List, labels: List):
+    def save_datasets(self, structures: List, labels: Union[List, None]=None):
         """
         Saving structrues and label to json file to avoid re-download entries from materialsproject.org.
         """
@@ -142,8 +146,12 @@ class Dataset:
         else:
             structures_dict = structures
         dataset = []
-        for structure_label in zip(structures_dict, labels):
-            dataset.append(structure_label)
+        if labels:
+            for structure_label in zip(structures_dict, labels):
+                dataset.append(structure_label)
+        else:
+            for structure in structures_dict:
+                dataset.append(structure)            
         with open(self.dataset_file,'w') as f:
             json.dump(dataset, f)
             
