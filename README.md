@@ -136,7 +136,6 @@ Using trainning function of model to train. Common trainning parameters can be d
       gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
 
-
 + **prediction**  
 The simplest method for predicting is using script predict.py in /user_easy_train_scripts.  
 Using predict_data funciton to predict.
@@ -159,7 +158,7 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
       dataset.save_datasets(strurtures, labels)
 ```
 
-<a name="Framework"></a>
+<a name="CrysNet Framework"></a>
 ## Framework
 CrysNet 
 
