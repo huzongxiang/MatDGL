@@ -14,7 +14,7 @@
 
 CrysNet can be installed easily through anaconda! As follows:
 
-+ Create a new conda environment named 'crysnet' by command, then activate environment 'crysnet':    
++ Create a new conda environment named "crysnet" by command, then activate environment "crysnet":    
 ```bash
       conda create -n crysnet python=3.8  
       conda activate crysnet 
@@ -54,7 +54,7 @@ CrysNet can be installed easily through anaconda! As follows:
 ## Usage
 ### fast testing soon
 CrysNet is very easy to use!  
-Just ***three steps*** can finish a fast test using crysnet:  
+<font color=#00ffff> Just ***three steps*** can finish a fast test using crysnet:</font>  
 + **download test data**  
 Get test datas from https://github.com/huzongxiang/CrysNetwork/datas/  
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
@@ -65,7 +65,7 @@ run command:
 ```bash
       python test.py  
 ```
-You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in ./results and ./models, respectively.
+You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in /results and /models, respectively.
 
 ### trainning script
 You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!   
@@ -74,7 +74,7 @@ You can use crysnet by provided trainning scripts in user_easy_trainscript only,
 Get current work directory of running trainning script, the script will read datas from 'workdir/datas/' , then saves results and models to 'workdir/results/' and 'workdir/models/'
 ```python
 from pathlib import Path
-ModulePath = Path(__file__).parent.absolute()
+ModulePath = Path(__file__).parent.absolute() # workdir
 ```
 #### fed trainning datas
 Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' defines regression/classification/multi-classification, 'data_path' gets path of trainning datas.
@@ -83,7 +83,7 @@ from crysnet.data import Dataset
 dataset = Dataset(task_type='dos_fermi', data_path=ModulePath)
 ```
 #### generator
-Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs.
+Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs and gets three generators.
 BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of bond distance in crystal.
 ```python
 from crysnet.data.generator import GraphGenerator
@@ -96,7 +96,7 @@ valid_data = Generators.valid_generator
 test_data = Generators.test_generator
 ```
 #### build model
-Module 
+Module GNN defines a trainning model. TransformerModel, GraphModel and MpnnModel are different model. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel.
 ```python
 from crysnet.models import GNN
 from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel 
@@ -124,7 +124,12 @@ gnn = GNN(model=TransformerModel,
       spherical_harmonics=True
       regression=dataset.regression
       optimizer = 'Adam'
-        )
+      )
+```
+### trainning
+Use trainning function of model to train. Common trainning parameters can be defined, workdir is current directory of trainning script, it saves results of model during trainning.
+```python
+gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
 <a name="CrysNet Framework"></a>
 ## Framework
