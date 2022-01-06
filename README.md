@@ -61,18 +61,32 @@ Download datas and put it in your trainning directory, test.py file should also 
 You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in ./results and ./models, respectively.
 
 ### trainning script
-You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!
+You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!   
+#### get datas
 Get current work directory of running trainning script, the script will read datas from 'workdir/datas/' , then saves results and models to 'workdir/results/' and 'workdir/models/'
 ```python
 from pathlib import Path
 ModulePath = Path(__file__).parent.absolute()
 ```
+#### fed trainning datas
 Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' defines regression/classification/multi-classification, 'data_path' gets path of trainning datas.
 ```python
 from crysnet.data import Dataset
 dataset = Dataset(task_type='dos_fermi', data_path=ModulePath)
 ```
-
+#### generator
+Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs.
+BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of bond distance in crystal.
+```python
+from crysnet.data.generator import GraphGenerator
+BATCH_SIZE = 64
+DATA_SIZE = None
+CUTOFF = 2.5
+Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
+train_data = Generators.train_generator
+valid_data = Generators.valid_generator
+test_data = Generators.test_generator
+```
 <a name="CrysNet Framework"></a>
 ## Framework
 CrysNet 
