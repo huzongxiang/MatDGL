@@ -3,7 +3,7 @@
 # Table of Contents
 * [Installation](#installation)
 * [Usage](#usage)
-* [CrysNet Framework](#crysnet-framework)
+* [Framework](#crysnet-framework)
 * [Contributors](#contributors)
 * [References](#references)
 
@@ -59,7 +59,7 @@ Download datas and put it in your trainning directory, test.py file should also 
 
 
 <a name="CrysNet Framework"></a>
-# CrysNet Framework
+# Framework
 CrysNet 
 
 
