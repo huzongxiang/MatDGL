@@ -16,7 +16,7 @@ Create a new conda environment named 'crysnet' by command：
 ```bash
       conda create -n crysnet python=3.8  
 ```
-Then activate environment crysnet：  
+Then activate environment 'crysnet'：  
 ```bash
       conda activate crysnet  
 ```    
