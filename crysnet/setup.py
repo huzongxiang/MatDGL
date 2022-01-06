@@ -10,7 +10,7 @@ setup(
     long_description_content_type='text/markdown',
     author='Zongxiang Hu',
     author_email='huzongxiang@yahoo.com',
-    download_url='https://github.com/materialsvirtuallab/megnet',
+    download_url='https://https://github.com/huzongxiang/CrysNetwork',
     license='BSD',
     install_requires=['numpy', "scikit-learn",
                       'pymatgen>=2019.10.4'],
@@ -23,7 +23,7 @@ setup(
         "crysnet": ["*.json", "*.md"],
     },
     include_package_data=True,
-    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing"],
+    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing", "topology"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3.8",
