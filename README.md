@@ -127,11 +127,16 @@ gnn = GNN(model=TransformerModel,
       )
 ```
 ### trainning
-Use trainning function of model to train. Common trainning parameters can be defined, workdir is current directory of trainning script, it saves results of model during trainning.
+Use trainning function of model to train. Common trainning parameters can be defined, workdir is current directory of trainning script, it saves results of model during trainning. If test_data exists, model will predict on test_data.
 ```python
 gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
 <a name="CrysNet Framework"></a>
+
+### prediction
+The simplest method for predicting is using script predict.py in /train
+
+
 ## Framework
 CrysNet 
 
