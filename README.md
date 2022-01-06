@@ -86,7 +86,7 @@ dataset = Dataset(task_type='multiclassfication', data_path=ModulePath)
 
 ##### generator
 Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs and gets three generators.
-BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of bond distance in crystal.
+BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of graph edges in crystal.
 ```python
 from crysnet.data.generator import GraphGenerator
 BATCH_SIZE = 64
