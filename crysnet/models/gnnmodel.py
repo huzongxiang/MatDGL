@@ -38,17 +38,12 @@ class GNN:
         dense_units=64,
         output_dim=64,
         readout_units=64,
-        dropout=0.0,
-        reg0=0.00,
-        reg1=0.00,
-        reg2=0.00,
-        reg3=0.00,
-        reg_rec=0.00,
         batch_size=16,
         spherical_harmonics=True,
         regression=True,
         optimizer = 'Adam',
         multiclassification=None,
+        **kwargs,
         ):
         self.model = model
         self.atom_dim = atom_dim
@@ -64,55 +59,39 @@ class GNN:
         self.dense_units = dense_units
         self.output_dim = output_dim
         self.readout_units = readout_units
-        self.dropout = dropout
-        self.reg0 = reg0
-        self.reg1 = reg1
-        self.reg2 = reg2
-        self.reg3 = reg3
-        self.reg_rec = reg_rec
         self.batch_size = batch_size
         self.spherical_harmonics = spherical_harmonics
         self.optimizer = optimizer
         self.regression = regression
         self.multiclassification = multiclassification
 
+        self.gnn = model(atom_dim=atom_dim,
+        bond_dim=bond_dim,
+        num_atom=num_atom,
+        state_dim=state_dim,
+        sp_dim=sp_dim,
+        units=units,
+        edge_steps=edge_steps,
+        message_steps=message_steps,
+        transform_steps=transform_steps,
+        num_attention_heads=num_attention_heads,
+        dense_units=dense_units,
+        output_dim=output_dim,
+        readout_units=readout_units,
+        batch_size=batch_size,
+        spherical_harmonics=spherical_harmonics,
+        regression=regression,
+        multiclassification=multiclassification,
+        **kwargs)
+
 
     def __getattr__(self, attr):
         return getattr(self.gnn, attr)
 
 
-    def gnn(self):
-        gnn = self.model(
-        atom_dim=self.atom_dim,
-        bond_dim=self.bond_dim,
-        num_atom=self.num_atom,
-        state_dim=self.state_dim,
-        sp_dim=self.sp_dim,
-        units=self.units,
-        edge_steps=self.edge_steps,
-        message_steps=self.message_steps,
-        transform_steps=self.transform_steps,
-        num_attention_heads=self.num_attention_heads,
-        dense_units=self.dense_units,
-        output_dim=self.output_dim,
-        readout_units=self.readout_units,
-        dropout=self.dropout,
-        reg0=self.reg0,
-        reg1=self.reg1,
-        reg2=self.reg2,
-        reg3=self.reg3,
-        reg_rec=self.reg_rec,
-        batch_size=self.batch_size,
-        spherical_harmonics=self.spherical_harmonics,
-        regression=self.regression,
-        multiclassification=self.multiclassification
-        )
-        return gnn
-
-
     def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
         
-        gnn = self.gnn()
+        gnn = self.gnn
         if self.regression:
             gnn.compile(
                 loss=keras.losses.MeanAbsoluteError(),
@@ -145,7 +124,7 @@ class GNN:
             else:
                 raise ValueError('load_weights should be "default" or "custom"')
             gnn.load_weights(best_checkpoint)
-        
+        print(train_data.task_type)
         Path(workdir/"model").mkdir(exist_ok=True)
         Path(workdir/"model"/train_data.task_type).mkdir(exist_ok=True)
         if checkpoints is None:
