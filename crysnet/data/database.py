@@ -25,9 +25,10 @@ class Dataset:
     Accessing materialsproject.org by api.
     """
     def __init__(self, task_type=None, data_path=None, api_key=None):
-        if task_type not in ['train', 'metal', 'band_gap', 'dos_fermi', 'formation_energy', 'formation_energy_all', 'formation_energy', 'e_above_hull', 'topology', 'topology_multi', 'GVRH', 'KVRH', 'possion_ratio', 'regression', 'classification', 'multiclassification']:
-            raise ValueError('Invalid task type! Input task_type should be train, regression, classification, multiclassification, metal, band_gap, dos_fermi, formation_energy, e_above_hull, formation_energy_all, formation_energy, topology, GVRH, KVRH, possion_ratio.')
+        if task_type not in ['my_regression', 'my_classification', 'my_multiclassification', 'metal', 'band_gap', 'dos_fermi', 'formation_energy', 'formation_energy_all', 'formation_energy', 'e_above_hull', 'topology', 'topology_multi', 'GVRH', 'KVRH', 'possion_ratio', 'regression', 'classification', 'multiclassification']:
+            raise ValueError('Invalid task type! Input task_type should be my_regression, my_classification, my_multiclassification, regression, classification, multiclassification, metal, band_gap, dos_fermi, formation_energy, e_above_hull, formation_energy_all, formation_energy, topology, GVRH, KVRH, possion_ratio.')
         
+        self.task_type = task_type
         self.multiclassification = False
         
         if task_type == 'band_gap':
@@ -66,9 +67,6 @@ class Dataset:
         elif task_type == 'classification':
             self.dataset_file = Path(data_path/"datas"/"dataset_classification.json")
             self.regression = False
-        elif task_type == 'train':
-            self.dataset_file = Path(data_path/"datas"/"dataset.json")
-            self.regression = None
         elif task_type == 'topology_multi':
             self.dataset_file = Path(data_path/"datas"/"dataset_tp_multi.json")
             self.regression = False
@@ -77,8 +75,19 @@ class Dataset:
             self.dataset_file = Path(data_path/"datas"/"dataset_multiclassification.json")
             self.regression = False
             self.multiclassification = True
+        elif task_type == 'my_regression':
+            self.dataset_file = Path(data_path/"datas"/"dataset_myr.json")
+            self.regression = True
+        elif task_type == 'my_classificaiton':
+            self.dataset_file = Path(data_path/"datas"/"dataset_myc.json")
+            self.regression = False
+        elif task_type == 'my_multiclassification':
+            self.dataset_file = Path(data_path/"datas"/"dataset_mym.json")
+            self.regression = False
+            self.multiclassification = True
         
-        self.task_type = task_type
+        self.structures = None
+        self.labels = None
 
         if self.dataset_file.exists():    
             with open(self.dataset_file, 'r') as f:
@@ -95,6 +104,7 @@ class Dataset:
                 self.dataset = self.structures
                 self.permuted_indices = self._permute_indices(self.structures)
                 self.datasize = len(self.structures)
+
         if api_key is not None:
             self.mpr = MPRester(api_key)
 
@@ -172,13 +182,18 @@ class Dataset:
 
         structures_shuffle = []
         labels_shuffle = []
+
+        if labels is None:
+            for index in permuted_indices:
+                structures_shuffle.append(structures[index])
+            return structures_shuffle
         for index in permuted_indices:
-            structures_shuffle.append(structures[index])
-            labels_shuffle.append(labels[index])
+                structures_shuffle.append(structures[index])
+                labels_shuffle.append(labels[index])
         return structures_shuffle, labels_shuffle
 
 
-    def prepare_train_set(self, structures: List=None, labels: List=None, permutation=None) -> List:
+    def prepare_train_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
         if labels:
@@ -195,7 +210,7 @@ class Dataset:
         return x_train, y_train
 
 
-    def prepare_validate_set(self, structures: List=None, labels: List=None, permutation=None) -> List:
+    def prepare_validate_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
         if labels:
@@ -212,7 +227,7 @@ class Dataset:
         return x_valid, y_valid
 
 
-    def prepare_test_set(self, structures: List=None, labels: List=None, permutation=None) -> List:
+    def prepare_test_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
         if labels:
@@ -230,15 +245,16 @@ class Dataset:
         return x_test, y_test
 
 
-    def prepare_x(self, structures: List=None) -> List:
+    def prepare_x(self, structures: List) -> List:
         if structures:
             self.structures = structures
+        else:
+            raise ValueError('strucutres should not be None.')
         return self.structure
     
     
     def prepare_y(self, labels: List=None) -> List:
-        if labels:
-            self.labels = labels
+        self.labels = labels
         return self.labels
 
 
