@@ -96,6 +96,9 @@ BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas you
       train_data = Generators.train_generator
       valid_data = Generators.valid_generator
       test_data = Generators.test_generator
+      
+      #if task is multiclassfication, should define variable multiclassifiction
+      multiclassification = Generators.multiclassification  
 ```
 
 + **building model**  
@@ -148,14 +151,28 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
 ```python
       import os
       from pymatgen.core.structure import Structure
-      structures = []
+      structures = []    # your structure list
       for cif in os.listdir(cif_path):
             structures.append(Structure.from_file(cif)) # the same as POSCAR
 
-      # save your structures and labels to dataset
+      # construct your dataset
       from crysnet.data import Dataset
-      dataset = Dataset(task_type='train', data_path=ModulePath)
+      dataset = Dataset(task_type='my_classification', data_path=ModulePath)  # task_type could be my_regression, my_classification, my_multiclassification
+      dataset.prepare_x(structures)
+      dataset.prepare_y(labels)   # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
+      
+      # alternatively, you can construct dataset as follow
+      dataset.structures = structures
+      dataset.labels = labels
+
+      # save your structures and labels to dataset in dataset_my*.json
       dataset.save_datasets(strurtures, labels)
+      
+      # for prediction on new datas without labels, Generators has not attribute multiclassification, should assign definite value
+      Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)  # dataset.labels is None
+      Generators.multiclassification = 5
+      multiclassification = Generators.multiclassification  # multiclassification = 5
+      
 ```
 
 <a name="Crysnet-framework"></a>
