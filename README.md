@@ -143,7 +143,8 @@ Using trainning function of model to train. Common trainning parameters can be d
 The simplest method for predicting is using script predict.py in /user_easy_train_scripts.  
 Using predict_data funciton to predict.
 ```python
-      gnn.predict_datas(test_data, workdir=ModulePath)
+      gnn.predict_datas(test_data, workdir=ModulePath)    # predict on test datas with labels
+      y_pred_keras = gnn.predict(datas)                   # predict on new datas without labels
 ```
 
 + **preparing your custom datas**  
@@ -151,15 +152,15 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
 ```python
       import os
       from pymatgen.core.structure import Structure
-      structures = []    # your structure list
+      structures = []                                        # your structure list
       for cif in os.listdir(cif_path):
-            structures.append(Structure.from_file(cif)) # the same as POSCAR
+            structures.append(Structure.from_file(cif))      # the same as POSCAR
 
       # construct your dataset
       from crysnet.data import Dataset
       dataset = Dataset(task_type='my_classification', data_path=ModulePath)  # task_type could be my_regression, my_classification, my_multiclassification
       dataset.prepare_x(structures)
-      dataset.prepare_y(labels)   # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
+      dataset.prepare_y(labels)      # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
       
       # alternatively, you can construct dataset as follow
       dataset.structures = structures
@@ -169,11 +170,14 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
       dataset.save_datasets(strurtures, labels)
       
       # for prediction on new datas without labels, Generators has not attribute multiclassification, should assign definite value
-      Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)  # dataset.labels is None
+      Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)     # dataset.labels is None
       Generators.multiclassification = 5
       multiclassification = Generators.multiclassification  # multiclassification = 5
       
 ```
+
++ **custom your model**
+
 
 <a name="Crysnet-framework"></a>
 ## Framework
