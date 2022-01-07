@@ -176,7 +176,7 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
       
 ```
 
-+ **custom your model and trainning**
++ **custom your model and trainning**  
 The Module GNN provides a flexible trainning framework to accept tensorflow.keras.models.Model type customized by user. Yon can custom your model and train the model according to the following example.
 ```python
       from tensorflow.keras.models import Model
