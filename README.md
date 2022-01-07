@@ -263,7 +263,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
               multiclassification=None,)
       gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
-The Module GNN has some basic parameter：
+      The Module GNN has some basic parameter necessary to be defined but not necessary to be used：
 ```python
       class GNN:
           def __init__(self,
@@ -274,7 +274,6 @@ The Module GNN has some basic parameter：
               state_dim=16,
               sp_dim=230,
               batch_size=16,
-              spherical_harmonics=True,
               regression=True,
               optimizer = 'Adam',
               multiclassification=None,
