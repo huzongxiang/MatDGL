@@ -23,7 +23,7 @@ def GraphModel(
         sp_dim=230,
         units=32,
         edge_steps=1,
-        message_steps=5,
+        message_steps=1,
         transform_steps=1,
         num_attention_heads=8,
         dense_units=32,
@@ -59,25 +59,12 @@ def GraphModel(
 
         pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-        # edge_features = EdgeMessagePassing(units,
-        #                                 edge_steps,
-        #                                 kernel_regularizer=l2(reg0),
-        #                                 sph=spherical_harmonics
-        #                                 )([bond_features, local_env, pair_indices])
-
         x = MessagePassing(message_steps,
                             kernel_regularizer=l2(reg0),
                             recurrent_regularizer=l2(reg_rec),
                             )([atom_features_, bond_features, state_attrs_, pair_indices,
                                 atom_graph_indices, bond_graph_indices]
                             )
-
-        # x = MessagePassing(message_steps,
-        #                     kernel_regularizer=l2(reg0),
-        #                     recurrent_regularizer=l2(reg0),
-        #                     )([atom_features_, edge_features, state_attrs_, pair_indices,
-        #                         atom_graph_indices, bond_graph_indices]
-        #                     )
         
         x_nodes_ = x[0]
         x_edges_ = x[1]
@@ -113,46 +100,23 @@ def GraphModel(
                 dense_units,
                 kernel_regularizer=l2(reg1),
                 )([x_nodes, edges_matrixs])
-        
-        # x_nodes = layers.BatchNormalization()(x_nodes)
-        # edges_matrixs = layers.BatchNormalization()(edges_matrixs)
-
-        # x_nodes_ = layers.Add()([x_nodes_a, x_nodes])
-        # edges_matrixs_ = layers.Add()([edges_matrixs_a, edges_matrixs])
-
-        # x_nodes = layers.Activation(activation="relu")(x_nodes_)
-        # edges_matrixs_ = layers.Activation(activation="relu")(edges_matrixs_)
 
         x_node = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_nodes)
         x_edge = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(edges_matrixs, edge_mode=True)
-
-        # x_nodes = TransformerEncoder(num_attention_heads, embed_dim=16, dense_dim=32)(x_nodes)
-        # x_edges = TransformerEncoder(num_attention_heads,  embed_dim=16, dense_dim=32)(x_edges)
-
-        # x_node = layers.GlobalAveragePooling1D()(x_nodes)
-        # x_edge = layers.GlobalAveragePooling1D()(x_edges)
         
-        x = layers.Concatenate(axis=-1, name='concat')([x_node, x_edge, x_state])
-            
-        # x = layers.BatchNormalization()(x)   
+        x = layers.Concatenate(axis=-1, name='concat')([x_node, x_edge, x_state])  
 
         x = layers.Dense(readout_units, activation="relu", kernel_regularizer=l2(reg3), name='readout0')(x)
-
-        # x = layers.BatchNormalization()(x) 
 
         if dropout:
             x = layers.Dropout(dropout, name='dropout0')(x)
 
         x = layers.Dense(readout_units//2, activation="relu", kernel_regularizer=l2(reg3), name='readout1')(x)
 
-        # x = layers.BatchNormalization()(x) 
-
         if dropout:
             x = layers.Dropout(dropout, name='dropout1')(x)
 
         x = layers.Dense(readout_units//4, activation="relu", kernel_regularizer=l2(reg3), name='readout2')(x)
-        
-        # x = layers.BatchNormalization()(x)   
 
         if dropout:
             x = layers.Dropout(dropout, name='dropout')(x)
@@ -218,11 +182,6 @@ def MpnnModel(
 
         edge_features = EdgeMessagePassing(units, edge_steps, sph=spherical_harmonics)([bond_features, local_env, pair_indices])
 
-        # x = MessagePassing(message_steps, kernel_regularizer=l2(reg0))(
-        #     [atom_features_, bond_features, state_attrs_, pair_indices,
-        #      atom_graph_indices, bond_graph_indices]
-        # )
-
         x = MessagePassing(message_steps, kernel_regularizer=l2(reg0))(
             [atom_features_, edge_features, state_attrs_, pair_indices,
              atom_graph_indices, bond_graph_indices]
@@ -231,14 +190,6 @@ def MpnnModel(
         x_nodes_ = x[0]
         x_edges_ = x[1]
         x_state = x[2]
-        
-        # edge_features = EdgeMessagePassing(units)([x_edges_, local_env, pair_indices])
-      
-        # x_nodes_b = PartitionPadding(batch_size)([x_nodes_, atom_graph_indices])
-        # x_edges_b = PartitionPadding(batch_size)([x_edges_, bond_graph_indices])
-
-
-        # x_edges_ = EdgeMessagePassing(units)([x_edges_, local_env, pair_indices])
       
         x_nodes_b = PartitionPadding(batch_size)([x_nodes_, atom_graph_indices])
         x_edges_b = PartitionPadding(batch_size)([x_edges_, bond_graph_indices])
@@ -246,41 +197,11 @@ def MpnnModel(
         x_nodes = layers.BatchNormalization()(x_nodes_b)
         x_edges = layers.BatchNormalization()(x_edges_b)
         
-        # edges_matrixs_a = EdgesAugmentedLayer()([x_edges, pair_indices_batch])
-        
         x_nodes = layers.Masking(mask_value=0.)(x_nodes)
         x_edges = layers.Masking(mask_value=0.)(x_edges)
-        # # edges_matrixs = Masking(mask_value=0.)(edges_matrixs_)  
-
-        # x_nodes = x_nodes_a
-        # edges_matrixs = edges_matrixs_a
-
-        # for i in range(transform_steps):
-        #     x_nodes, edges_matrixs = GraphTransformerEncoder(
-        #         num_attention_heads,
-        #         atom_dim,
-        #         bond_dim,
-        #         dense_units,
-        #         kernel_regularizer=l2(reg0),
-        #         )([x_nodes, edges_matrixs])
-        
-        # x_node_ = layers.BatchNormalization()(x_nodes)
-        # edges_matrixs_ = layers.BatchNormalization()(edges_matrixs)
-
-        # x_nodes_ = layers.Add()([x_nodes_a, x_nodes])
-        # edges_matrixs_ = layers.Add()([edges_matrixs_a, edges_matrixs])
-
-        # x_nodes = layers.Activation(activation="relu")(x_nodes_)
-        # edges_matrixs_ = layers.Activation(activation="relu")(edges_matrixs_)
 
         x_node = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_nodes)
         x_edge = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_edges)
-
-        # x_nodes = TransformerEncoder(num_attention_heads, embed_dim=16, dense_dim=32)(x_nodes)
-        # x_edges = TransformerEncoder(num_attention_heads,  embed_dim=16, dense_dim=32)(x_edges)
-
-        # x_node = layers.GlobalAveragePooling1D()(x_nodes)
-        # x_edge = layers.GlobalAveragePooling1D()(x_edges)
         
         x = layers.Concatenate(axis=-1, name='concat')([x_node, x_edge, x_state])
             
@@ -322,7 +243,7 @@ def TransformerModel(
         sp_dim=230,
         units=32,
         edge_steps=1,
-        message_steps=5,
+        message_steps=1,
         transform_steps=1,
         num_attention_heads=8,
         dense_units=32,
@@ -357,13 +278,6 @@ def TransformerModel(
         )
 
         pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
-
-        # edge_features = EdgeMessagePassing(units)([bond_features, local_env, pair_indices])
-
-        # x = MessagePassing(message_steps, kernel_regularizer=l2(reg0))(
-        #     [atom_features_, bond_features, state_attrs_, pair_indices,
-        #      atom_graph_indices, bond_graph_indices]
-        # )
 
         x_nodes_ = layers.Dense(16, kernel_regularizer=l2(reg0))(atom_features_)
         # x_edges_ = layers.Dense(64, kernel_regularizer=l2(reg0))(bond_features)
