@@ -67,7 +67,7 @@ Get test datas from https://github.com/huzongxiang/CrysNetwork/datas/
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
-+ **run command**
++ **run command**  
 run command:  
 ```bash
       python test.py  
