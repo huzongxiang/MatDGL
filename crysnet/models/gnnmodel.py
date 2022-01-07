@@ -30,14 +30,6 @@ class GNN:
         num_atom=118,
         state_dim=16,
         sp_dim=230,
-        units=32,
-        edge_steps=1,
-        message_steps=1,
-        transform_steps=1,
-        num_attention_heads=8,
-        dense_units=64,
-        output_dim=64,
-        readout_units=64,
         batch_size=16,
         spherical_harmonics=True,
         regression=True,
@@ -51,14 +43,6 @@ class GNN:
         self.num_atom = num_atom
         self.state_dim = state_dim
         self.sp_dim = sp_dim
-        self.units = units
-        self.edge_steps = edge_steps
-        self.message_steps = message_steps
-        self.transform_steps = transform_steps
-        self.num_attention_heads = num_attention_heads
-        self.dense_units = dense_units
-        self.output_dim = output_dim
-        self.readout_units = readout_units
         self.batch_size = batch_size
         self.spherical_harmonics = spherical_harmonics
         self.optimizer = optimizer
@@ -70,14 +54,6 @@ class GNN:
         num_atom=num_atom,
         state_dim=state_dim,
         sp_dim=sp_dim,
-        units=units,
-        edge_steps=edge_steps,
-        message_steps=message_steps,
-        transform_steps=transform_steps,
-        num_attention_heads=num_attention_heads,
-        dense_units=dense_units,
-        output_dim=output_dim,
-        readout_units=readout_units,
         batch_size=batch_size,
         spherical_harmonics=spherical_harmonics,
         regression=regression,
@@ -181,7 +157,7 @@ class GNN:
         if self.regression:
             plot_train_regression(history, train_data.task_type, workdir)
             if test_data:
-                plot_mae(gnn, test_data, name='test')
+                plot_mae(gnn, test_data, workdir, name='test')
         else:
             plot_train(history, train_data.task_type, workdir)
             if test_data:
@@ -224,6 +200,8 @@ class GNN:
             best_checkpoint = Path(workdir/"model"/save_file)
         gnn = self.gnn()
         gnn.load_weights(best_checkpoint)
+        y_pred_keras = gnn.predict(data).ravel()
+        return y_pred_keras
 
 
 def plot_train(history, name, path):
@@ -367,4 +345,4 @@ def plot_warm_up_lr(warm_up_lr, total_steps, lr, path):
     # plt.xticks(np.arange(0, epochs, 1))
     plt.grid()
     plt.title('Cosine decay with warmup', fontsize=20)
-    plt.savefig(Path(path/"results"/"cosine_decay.png"))    
+    plt.savefig(Path(path/"results"/"cosine_decay.png"))
