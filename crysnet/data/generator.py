@@ -72,16 +72,21 @@ class GraphGenerator:
         labels = self.dataset.labels
         task_type = self.dataset.task_type
 
-        structures, labels = self.dataset.shuffle_set(structures, labels)
+        if labels:
+            structures, labels = self.dataset.shuffle_set(structures, labels)
+        else:
+            structures = self.dataset.shuffle_set(structures)
 
         if self.data_size:
             num = self.data_size
             structures_used = structures[:num]
-            labels_used = labels[:num]
+            if labels:
+                labels_used = labels[:num]
             labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
         else:
             structures_used = structures
-            labels_used = labels
+            if labels:
+                labels_used = labels
             self.data_size = len(labels_used)
             labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
 
@@ -89,11 +94,12 @@ class GraphGenerator:
         x_= self.dataset.prepare_x(structures_used)
         x = labelledgraph.inputs_from_strcutre_list(x_)
 
-        y = self.dataset.prepare_y(labels_used)
+        if labels:
+            y = self.dataset.prepare_y(labels_used)
 
-        if self.dataset.multiclassification:
-            y = to_categorical(y)
-            self.multiclassification = len(y[0])
+            if self.dataset.multiclassification:
+                y = to_categorical(y)
+                self.multiclassification = len(y[0])
 
         data = GraphBatchGeneratorSequence(*x, y, task_type, batch_size=self.batch_size)
 
