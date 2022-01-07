@@ -26,13 +26,13 @@ ModulePath = Path(__file__).parent.absolute()
 
 # read datas from ModulePath/datas/multiclassfication.json
 print('reading dataset...')
-dataset = Dataset(task_type='dos_fermi', data_path=ModulePath)
+dataset = Dataset(task_type='multiclassification', data_path=ModulePath)
 print('done')
 print(dataset.dataset_file)
 
 BATCH_SIZE = 64
 DATA_SIZE = None
-CUTOFF = 2.0
+CUTOFF = 2.5
 
 # building batch generator for model trainning
 Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
@@ -128,4 +128,4 @@ gnn = GNN(model=TransformerModel,
         )
 
 # trainning model
-gnn.train(train_data, valid_data, test_data, epochs=500, lr=2e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
+gnn.train(train_data, valid_data, test_data, epochs=20, lr=5e-4, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
