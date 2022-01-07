@@ -4,7 +4,7 @@ GrysNet is a neural network package that allows researchers to train custom mode
 ## Hightlights
 + Easy to installation.
 + Three steps to fast testing.
-+ Flexible and adaptive to user's task.
++ Flexible and adaptive to user's trainning task.
 
 ## Table of Contents
 * [Installation](#installation)
