@@ -1,4 +1,4 @@
-# CrysNetwork
+# CrysNet
 
 
 ## Table of Contents
@@ -152,15 +152,15 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
 ```python
       import os
       from pymatgen.core.structure import Structure
-      structures = []                                        # your structure list
+      structures = []                                      # your structure list
       for cif in os.listdir(cif_path):
-            structures.append(Structure.from_file(cif))      # the same as POSCAR
+            structures.append(Structure.from_file(cif))    # for POSCAR too
 
       # construct your dataset
       from crysnet.data import Dataset
       dataset = Dataset(task_type='my_classification', data_path=ModulePath)  # task_type could be my_regression, my_classification, my_multiclassification
       dataset.prepare_x(structures)
-      dataset.prepare_y(labels)      # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
+      dataset.prepare_y(labels)   # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
       
       # alternatively, you can construct dataset as follow
       dataset.structures = structures
@@ -263,6 +263,69 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
               multiclassification=None,)
       gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
 ```
+      You can re-design output for your model, for example, your can set edges as your model output, the ouput can be used for your down stream task.
+```python
+      def MyModel(
+              bond_dim,
+              atom_dim=16,
+              num_atom=118,
+              state_dim=16,
+              sp_dim=230,
+              units=32,
+              message_steps=1,
+              readout_units=64,
+              batch_size=16,
+              regression=False,
+              multiclassification=None,
+              ):
+              atom_features = layers.Input((), dtype="int32", name="atom_features_input")
+              atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
+              bond_features = layers.Input((bond_dim), dtype="float32", name="bond_features")
+              local_env = layers.Input((6), dtype="float32", name="local_env")
+              state_attrs = layers.Input((), dtype="int32", name="state_attrs_input")   
+              state_attrs_ = layers.Embedding(sp_dim, state_dim, dtype="float32", name="state_attrs")(state_attrs)
+
+              pair_indices = layers.Input((2), dtype="int32", name="pair_indices")
+
+              atom_graph_indices = layers.Input(
+                  (), dtype="int32", name="atom_graph_indices"
+              )
+
+              bond_graph_indices = layers.Input(
+                  (), dtype="int32", name="bond_graph_indices"
+              )
+
+              pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
+
+              x = EdgeMessagePassing(units,
+                                        edge_steps,
+                                        kernel_regularizer=l2(reg0),
+                                        sph=spherical_harmonics
+                                        )([bond_features, local_env, pair_indices])
+
+              x = x[1]
+
+              x = PartitionPadding(batch_size)([x, bond_graph_indices])
+
+              x = layers.BatchNormalization()(x)
+
+              x = layers.GlobalAveragePooling1D()(x)
+
+              x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
+
+              x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
+
+              if regression:
+                  x = layers.Dense(1, name='final')(x)
+
+              model = Model(
+                  inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
+                          bond_graph_indices, pair_indices_per_graph],
+                  outputs=[x],
+              )
+              return model
+```
+
       The Module GNN has some basic parameter necessary to be defined but not necessary to be used：
 ```python
       class GNN:
