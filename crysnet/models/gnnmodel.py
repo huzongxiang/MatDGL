@@ -31,10 +31,10 @@ class GNN:
         state_dim=16,
         sp_dim=230,
         batch_size=16,
-        spherical_harmonics=True,
         regression=True,
-        optimizer = 'Adam',
+        ntarget=1,
         multiclassification=None,
+        optimizer='Adam',
         **kwargs,
         ):
         self.model = model
@@ -44,10 +44,10 @@ class GNN:
         self.state_dim = state_dim
         self.sp_dim = sp_dim
         self.batch_size = batch_size
-        self.spherical_harmonics = spherical_harmonics
-        self.optimizer = optimizer
         self.regression = regression
+        self.ntarget = ntarget
         self.multiclassification = multiclassification
+        self.optimizer = optimizer
 
         self.gnn = model(atom_dim=atom_dim,
         bond_dim=bond_dim,
@@ -55,7 +55,6 @@ class GNN:
         state_dim=state_dim,
         sp_dim=sp_dim,
         batch_size=batch_size,
-        spherical_harmonics=spherical_harmonics,
         regression=regression,
         multiclassification=multiclassification,
         **kwargs)
@@ -345,4 +344,4 @@ def plot_warm_up_lr(warm_up_lr, total_steps, lr, path):
     # plt.xticks(np.arange(0, epochs, 1))
     plt.grid()
     plt.title('Cosine decay with warmup', fontsize=20)
-    plt.savefig(Path(path/"results"/"cosine_decay.png"))
+    plt.savefig(Path(path/"results"/"cosine_decay.png"))    
