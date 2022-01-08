@@ -38,6 +38,7 @@ def GraphModel(
         batch_size=16,
         spherical_harmonics=False,
         regression=False,
+        ntarget=1,
         multiclassification=None,
         ):
         atom_features = layers.Input((), dtype="int32", name="atom_features_input")
@@ -122,7 +123,7 @@ def GraphModel(
             x = layers.Dropout(dropout, name='dropout')(x)
 
         if regression:
-            x = layers.Dense(1, name='final')(x)
+            x = layers.Dense(ntarget, name='final')(x)
         elif multiclassification is not None:
             x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
         else:
@@ -159,6 +160,7 @@ def MpnnModel(
         batch_size=16,
         spherical_harmonics=False,
         regression=False,
+        ntarget=1,
         multiclassification=None,
         ):
         atom_features = layers.Input((), dtype="int32", name="atom_features_input")
@@ -221,7 +223,7 @@ def MpnnModel(
             x = layers.Dropout(dropout, name='dropout')(x)
 
         if regression:
-            x = layers.Dense(1, name='final')(x)
+            x = layers.Dense(ntarget, name='final')(x)
         elif multiclassification is not None:
             x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
         else:
@@ -258,6 +260,7 @@ def TransformerModel(
         batch_size=16,
         spherical_harmonics=False,
         regression=False,
+        ntarget=1,
         multiclassification=None,
         ):
         atom_features = layers.Input((), dtype="int32", name="atom_features_input")
@@ -334,7 +337,7 @@ def TransformerModel(
             x = layers.Dropout(dropout, name='dropout')(x)
 
         if regression:
-            x = layers.Dense(1, name='final')(x)
+            x = layers.Dense(ntarget, name='final')(x)
         elif multiclassification is not None:
             x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
         else:
