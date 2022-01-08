@@ -16,6 +16,7 @@ class GraphGenerator:
         self.batch_size = batch_size
         self.cutoff = cutoff
         self.multiclassification = None
+        self.ntarget = 1
 
         self.train_generator, self.valid_generator, self.test_generator = self.generators()
 
@@ -58,7 +59,9 @@ class GraphGenerator:
             y_valid = to_categorical(y_valid)
             y_test = to_categorical(y_test)
             self.multiclassification = len(y_train[0])
-
+        
+        if self.dataset.regression:
+            self.ntarget = len(y_train[0])
 
         train_data = GraphBatchGeneratorSequence(*x_train, y_train, task_type, batch_size=self.batch_size)
         valid_data = GraphBatchGeneratorSequence(*x_valid, y_valid, task_type, batch_size=self.batch_size)
@@ -100,6 +103,9 @@ class GraphGenerator:
             if self.dataset.multiclassification:
                 y = to_categorical(y)
                 self.multiclassification = len(y[0])
+
+            if self.dataset.regression:
+                self.ntarget = len(y[0])
 
         data = GraphBatchGeneratorSequence(*x, y, task_type, batch_size=self.batch_size)
 
