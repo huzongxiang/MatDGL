@@ -1,30 +1,32 @@
 from setuptools import setup
 from setuptools import find_packages
 
+import os
+import re
+
+this_dir = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 
 setup(
     name='crysnet',
-    version='0.0.1',
+    version='0.0.3',
     description='Labelled Graph Networks for machine learning of crystal.',
-    long_description='using mpnn or graphtransformer to learn',
+    long_description=long_description,
     long_description_content_type='text/markdown',
     author='Zongxiang Hu',
     author_email='huzongxiang@yahoo.com',
-    download_url='https://https://github.com/huzongxiang/CrysNetwork',
+    download_url='https://github.com/huzongxiang/CrysNetwork',
     license='BSD',
-    install_requires=['numpy', "scikit-learn",
-                      'pymatgen>=2019.10.4'],
-    extras_require={
-        'tensorflow': ['tensorflow=2.6'],
-        'tensorflow with gpu': ['tensorflow-gpu=2.6'],
-        'mendeleev': ['mendeleev=0.9.0'],
-    },
+    install_requires=['numpy', "scikit-learn"],
     packages=find_packages(),
     package_data={
-        "crysnet": ["*.json", "*.md"],
+        "crysnet": ["*.json", "*.md", "*.png"],
     },
     include_package_data=True,
-    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing", "topology"],
+    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing", "topology", "tight", "bingding", "twisted", "graphene"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3.8",
