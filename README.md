@@ -61,7 +61,7 @@ CrysNet can be installed easily through anaconda! As follows:
 ## Usage
 ### Fast testing soon
 CrysNet is very easy to use!  
-<font color=#00ffff> Just ***three steps*** can finish a fast test using crysnet:</font>  
+Just ***three steps*** can finish a fast test using crysnet:
 + **download test data**  
 Get test datas from https://github.com/huzongxiang/CrysNetwork/datas/  
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
