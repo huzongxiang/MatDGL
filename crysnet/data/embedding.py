@@ -2,7 +2,7 @@
 """
 Created on Sat Oct  9 15:17:09 2021
 
-@author: hzx
+@author: huzongxiang
 """
 
 import json
@@ -181,7 +181,7 @@ class GaussianDistance(Converter):
     """
     Expand distance with Gaussian basis sit at centers and with width 0.5.
     """
-    def __init__(self, centers: np.ndarray=np.linspace(0, 1, 64), width=0.5):
+    def __init__(self, n=64, width=0.5):
         """
         Parameters
         ----------
@@ -195,7 +195,7 @@ class GaussianDistance(Converter):
         None.
 
         """
-        self.centers = centers
+        self.centers = np.linspace(0, 1, n)
         self.width = width
 
 
@@ -276,5 +276,3 @@ class Embedding_edges:
 
         """
         return self.converter.convert(d)
-    
-    

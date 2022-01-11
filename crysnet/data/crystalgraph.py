@@ -2,13 +2,14 @@
 """
 Created on Wed Jun  9 11:39:28 2021
 
-@author: hzx
+@author: huzongxiang
 """
 
 import time
 import json
 import numpy as np
 from tqdm import tqdm
+from pathlib import Path
 from operator import itemgetter
 from multiprocessing import Pool
 import tensorflow as tf
@@ -20,6 +21,9 @@ from pymatgen.core import Structure
 from pymatgen.analysis.local_env import NearNeighbors, VoronoiNN
 from crysnet.utils.get_nn import get_nn_info
 from crysnet.utils import get_space_group_number
+
+
+ModulePath = Path(__file__).parent.absolute()
 
 
 class LabelledCrystalGraphBase():
@@ -51,7 +55,7 @@ class LabelledCrystalGraphBase():
             self.strategy = strategy
         
         self.properties = None
-        with open('mendeleev.json','r') as f:
+        with open(Path(ModulePath/"mendeleev.json"),'r') as f:
             self.properties = json.load(f)
         if self.properties is None:
             self.properties = Mendeleev_property.get_mendeleev_properties()
@@ -304,9 +308,13 @@ class LabelledCrystalGraphBase():
 
 
 class LabelledCrystalGraph(LabelledCrystalGraphBase):
-    def __init__(self, cutoff=3.0):
+    def __init__(self, cutoff=3.0, mendeleev=False):
         self.cutoff = cutoff
-        
+        self.mendeleev = mendeleev
+        if self.mendeleev:
+            with open(Path(ModulePath/"mendeleev.json"),'r') as f:
+                self.properties = json.load(f)
+
 
     def graph_to_input(self, graph: Dict) -> List[np.ndarray]:
         """
@@ -321,12 +329,20 @@ class LabelledCrystalGraph(LabelledCrystalGraphBase):
             DESCRIPTION.
 
         """
-        distance_features = Embedding_edges(converter=GaussianDistance()).embedding(graph[Features.bond])
-        local_env = self._local_coordinates(graph)
+        if self.mendeleev:
+            atom_num_pairs = [[graph[Features.atom][pair[0]], graph[Features.atom][pair[1]]] for pair in graph[Features.pair_indices]]
+            distance_features = Embedding_edges(converter=GaussianDistance(n=57)).embedding(graph[Features.bond])
+            multi_properties = Embedding_edges(converter=MultiPropertyFeatures(self.properties)).embedding(atom_num_pairs)
+            bond_features = np.concatenate([distance_features, multi_properties], axis=1)
+            local_env = self._local_coordinates(graph)
+        else:
+            distance_features = Embedding_edges(converter=GaussianDistance()).embedding(graph[Features.bond])
+            local_env = self._local_coordinates(graph)
+            bond_features = distance_features
         
         return [
             np.array(graph[Features.atom], dtype=np.int32),
-            np.array(distance_features),
+            np.array(bond_features),
             np.array(graph[Features.state], dtype=np.int32),
             np.array(graph[Features.pair_indices], dtype=np.int32),
             np.array(local_env),

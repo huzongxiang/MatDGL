@@ -2,7 +2,7 @@
 """
 Created on Tue Dec 14 14:12:08 2021
 
-@author: huzon
+@author: huzongxiang
 """
 
 from tensorflow.keras.utils import to_categorical
@@ -10,11 +10,12 @@ from .crystalgraph import LabelledCrystalGraph, GraphBatchGeneratorSequence
 
 
 class GraphGenerator:
-    def __init__(self, dataset, data_size=None, batch_size=16, cutoff=3.0):
+    def __init__(self, dataset, data_size=None, batch_size=16, cutoff=3.0, mendeleev=False):
         self.dataset = dataset
         self.data_size = data_size
         self.batch_size = batch_size
         self.cutoff = cutoff
+        self.mendeleev = mendeleev
         self.multiclassification = None
         self.ntarget = 1
 
@@ -32,13 +33,13 @@ class GraphGenerator:
             num = self.data_size
             structures_used = structures[:num]
             labels_used = labels[:num]
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
+            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
             permutation = self.dataset.permute_indices(num)
         else:
             structures_used = structures
             labels_used = labels
             self.data_size = len(labels_used)
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
+            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
             permutation = self.dataset.permute_indices(len(labels_used))
 
         print('prepare datasets, 70% for train, 20% for valid, 10% for test.')
@@ -61,7 +62,8 @@ class GraphGenerator:
             self.multiclassification = len(y_train[0])
         
         if self.dataset.regression:
-            self.ntarget = len(y_train[0])
+            if isinstance(y_train[0], list):
+                self.ntarget = len(y_train[0])
 
         train_data = GraphBatchGeneratorSequence(*x_train, y_train, task_type, batch_size=self.batch_size)
         valid_data = GraphBatchGeneratorSequence(*x_valid, y_valid, task_type, batch_size=self.batch_size)
@@ -85,13 +87,13 @@ class GraphGenerator:
             structures_used = structures[:num]
             if labels:
                 labels_used = labels[:num]
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
+            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
         else:
             structures_used = structures
             if labels:
                 labels_used = labels
             self.data_size = len(labels_used)
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff)
+            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
 
         print('preparing dataset...')
         x_= self.dataset.prepare_x(structures_used)
@@ -105,7 +107,8 @@ class GraphGenerator:
                 self.multiclassification = len(y[0])
 
             if self.dataset.regression:
-                self.ntarget = len(y[0])
+                if isinstance(y[0], list):
+                    self.ntarget = len(y[0])
 
         data = GraphBatchGeneratorSequence(*x, y, task_type, batch_size=self.batch_size)
 

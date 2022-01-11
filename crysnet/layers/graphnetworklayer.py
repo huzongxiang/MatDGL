@@ -2,7 +2,7 @@
 """
 Created on Sun Oct 10 15:33:33 2021
 
-@author: hzx
+@author: huzongxiang
 """
 
 from typing import Sequence

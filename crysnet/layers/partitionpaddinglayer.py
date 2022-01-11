@@ -3,7 +3,7 @@
 """
 Created on Wed Oct 13 14:47:13 2021
 
-@author: hzx
+@author: huzongxiang
 """
 
 import tensorflow as tf
