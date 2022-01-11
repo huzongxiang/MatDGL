@@ -92,7 +92,7 @@ class Dataset:
         if self.dataset_file.exists():    
             with open(self.dataset_file, 'r') as f:
                 entries = json.load(f)
-            if isinstance(entries[0], tuple):
+            if isinstance(entries[0], list):
                 self.structures = [Structure.from_dict(s[0]) for s in entries]
                 self.labels = [s[1] for s in entries]
                 self.dataset = zip(self.structures, self.labels)
