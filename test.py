@@ -100,7 +100,7 @@ print('\n----- parameters -----',
 del dataset
 
 # default model is a GraphTransformer model, can be changed to MPNN model by set 'model=MpnnModel'
-gnn = GNN(model=TransformerModel,
+gnn = GNN(model=MpnnBaseModel,
         atom_dim=atom_dim,
         bond_dim=bond_dim,
         num_atom=num_atom,
