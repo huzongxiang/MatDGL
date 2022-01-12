@@ -2,7 +2,7 @@
 """
 Created on Sun Oct 10 15:33:33 2021
 
-@author: huzongxiang
+@author: hzx
 """
 
 from typing import Sequence
@@ -15,7 +15,7 @@ from crysnet.utils.spherical_harmonics import evaluate_spherical_harmonics
 class SphericalBasisLayer(layers.Layer):
     
     def __init__(self, edge_dim=64,
-                 num_spherical=7,
+                 num_spherical=6,
                  kernel_initializer="glorot_uniform",
                  kernel_regularizer=None,
                  kernel_constraint=None,
@@ -133,7 +133,7 @@ class SphericalBasisLayer(layers.Layer):
 
 class AzimuthLayer(layers.Layer):
     
-    def __init__(self, units=16,
+    def __init__(self, units=64,
                  kernel_initializer="glorot_uniform",
                  kernel_regularizer=None,
                  kernel_constraint=None,
@@ -670,5 +670,4 @@ class EdgeGraphNetwork(layers.Layer):
     def get_config(self):
         config = super().get_config()
         config.update({"steps": self.steps})
-        return config    
-    
+        return config
