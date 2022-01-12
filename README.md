@@ -113,7 +113,7 @@ Module GNN defines a trainning model. TransformerModel, GraphModel and MpnnModel
 ```python
       from crysnet.models import GNN
       from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel, MpnnBaseModel, TransformerBaseModel, DirectionalMpnnModel, DirectionalTransformerModel 
-      gnn = GNN(model=TransformerModel,
+      gnn = GNN(model=MpnnBaseModel,
             atom_dim=16
             bond_dim=64
             num_atom=118
