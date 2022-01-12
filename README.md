@@ -112,7 +112,7 @@ BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas you
 Module GNN defines a trainning model. TransformerModel, GraphModel and MpnnModel are different models. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel. MpnnBaseModel and TransformerBaseModel don't take directional informations of crystal into count so them run faster. MpnnBaseModel is the fastest model but accuracy is enough for most tasks. TransformerModel can achieve the hightest accuracy in most tasks.
 ```python
       from crysnet.models import GNN
-      from crysnet.models.graphmodel import GraphModel, MpnnBaseModel, TransformerBaseModel , MpnnModel, TransformerModel 
+      from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel, MpnnBaseModel, TransformerBaseModel, DirectionalMpnnModel, DirectionalTransformerModel 
       gnn = GNN(model=TransformerModel,
             atom_dim=16
             bond_dim=64
