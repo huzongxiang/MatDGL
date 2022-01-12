@@ -13,7 +13,7 @@ import tensorflow as tf
 from crysnet.data import Dataset
 from crysnet.models import GNN
 from crysnet.data.generator import GraphGenerator
-from crysnet.models.graphmodel import TransformerModel, MpnnModel, GraphModel
+from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel, MpnnBaseModel, TransformerBaseModel, DirectionalMpnnModel, DirectionalTransformerModel
 
 tf.get_logger().setLevel(logging.ERROR)
 warnings.filterwarnings("ignore")
