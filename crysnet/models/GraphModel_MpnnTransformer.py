@@ -15,7 +15,7 @@ from MPNNTransformer import MpnnTransformerEncoder
 from Readout import Set2Set
 
 
-def GraphModel(
+def GraphformerModel(
         bond_dim,
         atom_dim=16,
         num_atom=118,
@@ -59,13 +59,7 @@ def GraphModel(
 
         pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-        edge_features = EdgeMessagePassing(units,
-                                        edge_steps,
-                                        kernel_regularizer=l2(reg0),
-                                        sph=spherical_harmonics
-                                        )([bond_features, local_env, pair_indices])
-
-        x_nodes_, x_edges_, x_state = MpnnTransformerEncoder()([atom_features_, edge_features, state_attrs_, pair_indices, atom_graph_indices, bond_graph_indices])
+        x_nodes_, x_edges_, x_state = MpnnTransformerEncoder()([atom_features_, bond_features, state_attrs_, pair_indices, atom_graph_indices, bond_graph_indices])
       
         x_nodes_b = PartitionPadding(batch_size)([x_nodes_, atom_graph_indices])
         x_edges_b = PartitionPadding(batch_size)([x_edges_, bond_graph_indices])

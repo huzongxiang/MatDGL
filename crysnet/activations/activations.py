@@ -39,4 +39,4 @@ def shifted_softplus(x):
 
     """
     
-    return tf.nn.softplus(x) - tf.log(2.0)
+    return tf.nn.softplus(x) - tf.math.log(2.0)

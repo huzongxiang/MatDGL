@@ -9,7 +9,6 @@ from typing import Sequence
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import activations, initializers, regularizers, constraints
-from crysnet.activations import shifted_softplus
 
 
 class MessagePassing(layers.Layer):
@@ -96,7 +95,7 @@ class MessagePassing(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
 
         # each bond in pair_indices, concatenate thier atom features by atom indexes
         # then concatenate atom features with bond features
@@ -105,7 +104,7 @@ class MessagePassing(layers.Layer):
         
         # repeat state attributes by bond_graph_indices, then concatenate to bond_merge_atom_features
         state_attrs_repeat = tf.gather(state_attrs, bond_graph_indices)
-        edges_features_concated = tf.concat([edges_merge_atom_features, state_attrs_repeat, edges_sph_features], axis=-1)
+        edges_features_concated = tf.concat([edges_merge_atom_features, state_attrs_repeat, edges_features], axis=-1)
 
         return edges_features_concated
         
@@ -123,7 +122,7 @@ class MessagePassing(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
         
         # concat state_attrs with atom_features to get merged atom_merge_state_features
         state_attrs_repeat = tf.gather(state_attrs, atom_graph_indices)
@@ -137,7 +136,7 @@ class MessagePassing(layers.Layer):
         # so num_bonds of bond features need num_bonds of bond matrix, so a matrix with shape
         # (num_bonds,(atom_dim,atom_dim,bond_dim)) to transfer bond_features to shape (num_bonds,(atom_dim,atom_dim))
         # finally, apply this bond_matrix to adjacent atoms, get bond_features updated atom_features_neighbors
-        edges_weights = tf.matmul(edges_sph_features, self.kernel) + self.bias
+        edges_weights = tf.matmul(edges_features, self.kernel) + self.bias
         edges_weights = tf.reshape(edges_weights, (-1, self.atom_dim + self.state_dim, self.atom_dim + self.state_dim))
         atom_features_neighbors = tf.gather(atom_merge_state_features, pair_indices[:, 1])
         atom_features_neighbors = tf.expand_dims(atom_features_neighbors, axis=-1)
@@ -166,10 +165,10 @@ class MessagePassing(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
 
         # concat state_attrs with bond_updated and atom_features_aggregated
-        edges_features_sum = tf.math.segment_sum(edges_sph_features, bond_graph_indices)
+        edges_features_sum = tf.math.segment_sum(edges_features, bond_graph_indices)
         atom_features_sum = tf.math.segment_sum(atom_features, atom_graph_indices)
         state_attrs_concated = tf.concat([atom_features_sum, edges_features_sum, state_attrs], axis=-1)
 
@@ -189,10 +188,10 @@ class MessagePassing(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
         
         atom_features_updated = atom_features
-        edges_features_updated =  edges_sph_features
+        edges_features_updated =  edges_features
         state_attrs_updated = state_attrs
 
         # Perform a number of steps of message passing
@@ -235,7 +234,7 @@ class MessagePassing(layers.Layer):
         return config
 
 
-class MessagePassingSotfplus(layers.Layer):
+class NewMessagePassing(layers.Layer):
     """
     Introducing a kernel sigmoid(node_features) * softplus(node_features) from Xie et al. PHYSICAL REVIEW LETTERS 120, 145301 (2018)
     """
@@ -323,8 +322,6 @@ class MessagePassingSotfplus(layers.Layer):
                 constraint=self.bias_constraint,
                 name='nodes_bias_g',
             )
-
-        self.softplus = shifted_softplus    
         
         self.built = True
 
@@ -342,7 +339,7 @@ class MessagePassingSotfplus(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
 
         # each bond in pair_indices, concatenate thier atom features by atom indexes
         # then concatenate atom features with bond features
@@ -351,7 +348,7 @@ class MessagePassingSotfplus(layers.Layer):
         
         # repeat state attributes by bond_graph_indices, then concatenate to bond_merge_atom_features
         state_attrs_repeat = tf.gather(state_attrs, bond_graph_indices)
-        edges_features_concated = tf.concat([edges_merge_atom_features, state_attrs_repeat, edges_sph_features], axis=-1)
+        edges_features_concated = tf.concat([edges_merge_atom_features, state_attrs_repeat, edges_features], axis=-1)
 
         return edges_features_concated
         
@@ -369,7 +366,7 @@ class MessagePassingSotfplus(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
         
         # concat state_attrs with atom_features to get merged atom_merge_state_features
         state_attrs_repeat = tf.gather(state_attrs, atom_graph_indices)
@@ -383,10 +380,10 @@ class MessagePassingSotfplus(layers.Layer):
         # so num_bonds of bond features need num_bonds of bond matrix, so a matrix with shape
         # (num_bonds,(atom_dim,atom_dim,bond_dim)) to transfer bond_features to shape (num_bonds,(atom_dim,atom_dim))
         # finally, apply this bond_matrix to adjacent atoms, get bond_features updated atom_features_neighbors
-        edges_weights_s = tf.matmul(edges_sph_features, self.kernel_s) + self.bias_s
+        edges_weights_s = tf.matmul(edges_features, self.kernel_s) + self.bias_s
         edges_weights_s = tf.reshape(edges_weights_s, (-1, self.atom_dim + self.state_dim, self.atom_dim + self.state_dim))
 
-        edges_weights_g = tf.matmul(edges_sph_features, self.kernel_g) + self.bias_g
+        edges_weights_g = tf.matmul(edges_features, self.kernel_g) + self.bias_g
         edges_weights_g = tf.reshape(edges_weights_g, (-1, self.atom_dim + self.state_dim, self.atom_dim + self.state_dim))
 
         atom_features_neighbors = tf.gather(atom_merge_state_features, pair_indices[:, 1])
@@ -402,7 +399,7 @@ class MessagePassingSotfplus(layers.Layer):
         # first tf.gather end features using end atom index pair_indices[:,1] to atom_features_neighbors
         # then using bond matrix updates atom_features_neighbors, get transformed_features
         # finally tf.segment_sum calculates sum of updated neighbors feature by start atom index pair_indices[:,0]
-        transformed_features = tf.sigmod(transformed_features_s) * self.softplus(transformed_features_g)
+        transformed_features = tf.sigmoid(transformed_features_s) * tf.nn.softplus(transformed_features_g)
         atom_features_aggregated = tf.math.segment_sum(transformed_features, pair_indices[:,0])
 
         return atom_features_aggregated
@@ -421,10 +418,10 @@ class MessagePassingSotfplus(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
 
         # concat state_attrs with bond_updated and atom_features_aggregated
-        edges_features_sum = tf.math.segment_sum(edges_sph_features, bond_graph_indices)
+        edges_features_sum = tf.math.segment_sum(edges_features, bond_graph_indices)
         atom_features_sum = tf.math.segment_sum(atom_features, atom_graph_indices)
         state_attrs_concated = tf.concat([atom_features_sum, edges_features_sum, state_attrs], axis=-1)
 
@@ -444,10 +441,10 @@ class MessagePassingSotfplus(layers.Layer):
             DESCRIPTION.
 
         """
-        atom_features, edges_sph_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
+        atom_features, edges_features, state_attrs, pair_indices, atom_graph_indices, bond_graph_indices = inputs
         
         atom_features_updated = atom_features
-        edges_features_updated =  edges_sph_features
+        edges_features_updated =  edges_features
         state_attrs_updated = state_attrs
 
         # Perform a number of steps of message passing

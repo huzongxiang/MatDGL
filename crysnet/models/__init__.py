@@ -5,4 +5,4 @@ Created on Mon Dec 20 15:15:31 2021
 @author: huzongxiang
 """
 
-from .gnnmodel import GNN
+from .gnnframework import GNN
