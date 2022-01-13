@@ -18,6 +18,10 @@ from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel, M
 tf.get_logger().setLevel(logging.ERROR)
 warnings.filterwarnings("ignore")
 
+# solving memory leak when trainning on big batch size 
+gpus = tf.config.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(gpus[0], True)
+
 np.random.seed(52)
 tf.random.set_seed(52)
 
@@ -30,7 +34,7 @@ dataset = Dataset(task_type='multiclassification', data_path=ModulePath)
 print('done')
 print(dataset.dataset_file)
 
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 DATA_SIZE = None
 CUTOFF = 2.5
 
