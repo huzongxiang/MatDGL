@@ -97,6 +97,122 @@ class SphericalBasisLayer(layers.Layer):
         return phi_theta, edges_neighbor
 
 
+class GlobalSphericalBasisLayer(layers.Layer):
+    
+    def __init__(self, edge_dim=64,
+                 num_spherical=6,
+                 kernel_initializer="glorot_uniform",
+                 kernel_regularizer=None,
+                 kernel_constraint=None,
+                 use_bias=False,
+                 bias_initializer="zeros",
+                 bias_regularizer=None,
+                 bias_constraint=None,
+                 **kwargs):
+        super().__init__( **kwargs)
+        self.edge_dim = edge_dim
+        self.num_spherical = num_spherical
+        self.kernel_initializer = kernel_initializer
+        self.kernel_regularizer = kernel_regularizer
+        self.kernel_constraint = kernel_constraint
+        self.use_bias = use_bias
+        self.bias_initializer = bias_initializer
+        self.bias_regularizer = bias_regularizer
+        self.bias_constraint = bias_constraint
+    
+
+    def build(self, input_shape):
+        dense_dim = self.num_spherical**2
+
+        with tf.name_scope("edge_aggregate"):
+            self.kernel = self.add_weight(
+                shape=(dense_dim, 
+                    self.edge_dim),
+                trainable=True,
+                initializer=self.kernel_initializer,
+                regularizer=self.kernel_regularizer,
+                constraint=self.kernel_constraint,
+                name='sph_kernel',
+            )
+            self.bias = self.add_weight(
+                shape=(self.edge_dim,),
+                trainable=True,
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint=self.bias_constraint,
+                name='sph_bias',
+            )
+        
+        self.built = True
+        
+
+    def spherical_coordiates(self, local_env, pair_indices):
+        """
+        Parameters
+        ----------
+        graph : Dict
+            DESCRIPTION.
+
+        Returns
+        -------
+        List
+            return local spherical coordinate parameters theta and phi for every edges and their index.
+
+        """
+        local_env = tf.reshape(local_env, shape=(-1, 2, 3))
+        polar = local_env[:,0]
+        edges = local_env[:,1]
+        
+        inner_product_theta = tf.reduce_sum(polar * edges, axis=-1)
+        cross_product_theta = tf.linalg.cross(polar, edges)
+        cross_product_theta = tf.norm(cross_product_theta, axis=-1)
+        theta = tf.math.atan2(cross_product_theta, inner_product_theta)
+
+        edges_projected = edges * tf.expand_dims(tf.cos(theta), axis=-1)  
+        inner_product_phi = tf.reduce_sum(vetical * edges_projected, axis=-1)
+        cross_product_phi = tf.linalg.cross(polar, edges_projected)
+        cross_product_phi = tf.norm(cross_product_phi, axis=-1)
+        phi = tf.math.atan2(cross_product_phi, inner_product_phi)
+        
+        phi_theta = tf.concat([tf.expand_dims(phi, -1), tf.expand_dims(theta, -1)], -1)
+        
+        return phi_theta
+
+
+    def sph_harm_func(self, phi_theta):
+        phi = phi_theta[:, 0]
+        theta = phi_theta[:, 1]
+        Ylm = tf.stack([
+                evaluate_spherical_harmonics(l, m, theta, phi) for l in range(self.num_spherical) for m in range(-l, l + 1)])
+        sph_harm_features = tf.transpose(Ylm, perm=(1, 0))
+        return sph_harm_features
+
+        
+    def call(self, inputs):
+        """
+        Parameters
+        ----------
+        inputs : theta and phi of edges in local coordinates.
+
+        Returns
+        -------
+        Ylm : spherical harmonics for local coordinates theta and phi.
+        """
+        local_env, pair_indices = inputs
+        phi_theta, edges_neighbor = self.spherical_coordiates(local_env, pair_indices)
+        # sph_harm_features = tf.cast(self.sph_harm_func(1,0,phi_theta[:,0],phi_theta[:,1]).real, dtype=tf.float32)
+        sph_harm_features = self.sph_harm_func(phi_theta)
+        sph_harm_features = tf.matmul(sph_harm_features, self.kernel) + self.bias
+        return sph_harm_features, edges_neighbor
+
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"units": self.units})
+        config.update({"num_spherical", self.num_spherical})
+        return config
+
+
     def sph_harm_func(self, phi_theta):
         phi = phi_theta[:, 0]
         theta = phi_theta[:, 1]
