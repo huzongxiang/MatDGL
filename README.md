@@ -96,7 +96,7 @@ Module GraphGenerator feds datas into model during trainning. The Module splits 
 BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of graph edges in crystal.
 ```python
       from crysnet.data.generator import GraphGenerator
-      BATCH_SIZE = 64
+      BATCH_SIZE = 128
       DATA_SIZE = None
       CUTOFF = 2.5
       Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
