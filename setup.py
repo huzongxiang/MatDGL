@@ -11,7 +11,7 @@ with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='crysnet',
-    version='0.1.1',
+    version='0.1.2',
     description='Labelled Graph Networks for machine learning of crystal.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -27,7 +27,7 @@ setup(
     include_package_data=True,
     keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing", "topology", "tight", "bingding", "twisted", "graphene"],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3.8",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: BSD License",
