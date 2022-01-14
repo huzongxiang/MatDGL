@@ -26,6 +26,7 @@ CrysNet can be installed easily through anaconda! As follows:
       conda create -n crysnet python=3.8  
       conda activate crysnet 
 ```
+   It's necessary to create a new conda environment to aviod bugs causing by version conflict.   
  
 + Configure dependencies of crysnet:
 ```bash
@@ -45,7 +46,6 @@ CrysNet can be installed easily through anaconda! As follows:
 
 + Install other dependencies:  
 ```bash
-      pip install atom2vec  
       pip install mendeleev  
       conda install graphviz # or pip install graphviz  
       conda install pydot # or pip install pydot  
