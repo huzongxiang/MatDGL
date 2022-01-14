@@ -46,7 +46,6 @@ CrysNet can be installed easily through anaconda! As follows:
 
 + Install other dependencies:  
 ```bash
-      pip install atom2vec  
       pip install mendeleev  
       conda install graphviz # or pip install graphviz  
       conda install pydot # or pip install pydot  
