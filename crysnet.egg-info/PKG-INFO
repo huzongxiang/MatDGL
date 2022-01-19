@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: crysnet
-Version: 0.1.6
+Version: 0.1.7
 Summary: Labelled Graph Networks for machine learning of crystal.
 Home-page: UNKNOWN
 Author: Zongxiang Hu
@@ -131,10 +131,11 @@ multiclassification = Generators.multiclassification
 ```
 
 + **building model**  
-Module GNN defines a trainning framework that accepts a series of self-difined models. We provide GraphModel, MpnnBaseModel, TransformerBaseModel , MpnnModel, TransformerModel, DirectionalMpnnModel, DirectionalTransformerModel and CGCNN model according to your demends. TransformerModel, GraphModel and MpnnModel are different models. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel. MpnnBaseModel and TransformerBaseModel don't take directional informations of crystal into count so them run faster. MpnnBaseModel is the fastest model but accuracy is enough for most tasks. TransformerModel can achieve the hightest accuracy in most tasks. The CGCNN model is crystal graph convolution CNN model.
+Module GNN defines a trainning framework that accepts a series of models. Crysnet provides a series of mainstream models as your need.
 ```python
 from crysnet.models import GNN
-from crysnet.models.graphmodel import GraphModel, MpnnBaseModel, TransformerBaseModel , MpnnModel, TransformerModel, DirectionalMpnnModel, DirectionalTransformerModel 
+from crysnet.models.graphmodel import MpnnBaseModel, TransformerBaseModel, CgcnnModel, GraphAttentionModel
+
 gnn = GNN(model=MpnnBaseModel,
       atom_dim=16
       bond_dim=64
@@ -204,6 +205,12 @@ Generators.multiclassification = 5
 multiclassification = Generators.multiclassification  # multiclassification = 5
       
 ```
++ **models provided by crysnet**  
+ We provide GraphModel, MpnnBaseModel, TransformerBaseModel, MpnnModel, TransformerModel, DirectionalMpnnModel, DirectionalTransformerModel and CGCNN model according to your demends. TransformerModel, GraphModel and MpnnModel are different models. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel. MpnnBaseModel and TransformerBaseModel don't take directional informations of crystal into count so them run faster. MpnnBaseModel is the fastest model but accuracy is enough for most tasks. TransformerModel can achieve the hightest accuracy in most tasks. The CGCNN model is the crystal graph convolution neural network model. The GraphAttentionModel is the graph attention neural network.
+```python
+from crysnet.models import GNN
+from crysnet.models.graphmodel import MpnnBaseModel, TransformerBaseModel , DirectionalMpnnModel, DirectionalTransformerModel, MpnnModel, TransformerModel, GraphModel, CgcnnModel, GraphAttentionModel
+```
 
 + **custom your model and trainning**  
 The Module GNN provides a flexible trainning framework to accept tensorflow.keras.models.Model type customized by user. Yon can custom your model and train the model according to the following example.
@@ -263,11 +270,11 @@ def MyModel(
             x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
 
             if regression:
-            x = layers.Dense(1, name='final')(x)
+                  x = layers.Dense(1, name='final')(x)
             elif multiclassification is not None:
-            x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
+                  x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
             else:
-            x = layers.Dense(1, activation="sigmoid", name='final')(x)
+                  x = layers.Dense(1, activation="sigmoid", name='final')(x)
 
             model = Model(
             inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
@@ -346,7 +353,7 @@ def MyModel(
             x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
 
             if regression:
-            x = layers.Dense(1, name='final')(x)
+                  x = layers.Dense(1, name='final')(x)
 
             model = Model(
             inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
