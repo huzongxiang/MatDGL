@@ -12,7 +12,7 @@ from crysnet.layers import MessagePassing, NewMessagePassing
 from crysnet.layers import SphericalBasisLayer, AzimuthLayer, ConcatLayer, EdgeMessagePassing
 from crysnet.layers import PartitionPadding, PartitionPaddingPair
 from crysnet.layers import EdgesAugmentedLayer, GraphTransformerEncoder
-from crysnet.layers import GraphormerEncoder, ConvGraphormerEncoder
+from crysnet.layers import GNGroverEncoder, ConvGroverEncoder
 from crysnet.layers import GraphAttentionLayer
 from crysnet.layers import CrystalGraphConvolution
 from crysnet.layers import Set2Set
@@ -335,7 +335,7 @@ def MpnnBaseModel(
         return model
 
 
-def NewMpnnBaseModel(
+def CgMpnnBaseModel(
         bond_dim,
         atom_dim=16,
         num_atom=118,
@@ -1043,7 +1043,7 @@ def GraphAttentionModel(
         return model
 
 
-def GraphormerModel(
+def GNGroverModel(
         bond_dim,
         atom_dim=16,
         num_atom=118,
@@ -1087,13 +1087,16 @@ def GraphormerModel(
 
         pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-        x_nodes_, x_edges_, x_state = GraphormerEncoder()([atom_features_, bond_features, state_attrs_, pair_indices, atom_graph_indices, bond_graph_indices])
+        x_nodes_, x_edges_, x_state = GNGroverEncoder()([atom_features_, bond_features, state_attrs_, pair_indices, atom_graph_indices, bond_graph_indices])
       
         x_nodes_b = PartitionPadding(batch_size)([x_nodes_, atom_graph_indices])
         x_edges_b = PartitionPadding(batch_size)([x_edges_, bond_graph_indices])
 
         x_nodes = layers.BatchNormalization()(x_nodes_b)
         x_edges = layers.BatchNormalization()(x_edges_b)
+
+        x_nodes = layers.Masking(mask_value=0.)(x_nodes)
+        x_edges = layers.Masking(mask_value=0.)(x_edges)
 
         x_node = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_nodes)
         x_edge = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_edges)
@@ -1130,7 +1133,7 @@ def GraphormerModel(
         return model
 
 
-def ConvGraphormerModel(
+def ConvGroverModel(
         bond_dim,
         atom_dim=16,
         num_atom=118,
@@ -1174,12 +1177,14 @@ def ConvGraphormerModel(
 
         pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-        x_nodes_ = ConvGraphormerEncoder()([atom_features_, bond_features,
+        x_nodes_ = ConvGroverEncoder(steps=message_steps)([atom_features_, bond_features,
                                          state_attrs_, pair_indices, atom_graph_indices, bond_graph_indices])
-      
+       
         x_nodes_b = PartitionPadding(batch_size)([x_nodes_, atom_graph_indices])
 
         x_nodes = layers.BatchNormalization()(x_nodes_b)
+
+        # x_nodes = layers.Masking(mask_value=0.)(x_nodes)
 
         x = Set2Set(output_dim, kernel_regularizer=l2(reg2), recurrent_regularizer=l2(reg_rec))(x_nodes)
             
