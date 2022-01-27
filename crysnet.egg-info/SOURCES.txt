@@ -23,8 +23,8 @@ crysnet/layers/crystalgraphlayer.py
 crysnet/layers/edgenetworklayer.py
 crysnet/layers/graphattentionlayer.py
 crysnet/layers/graphnetworklayer.py
-crysnet/layers/graphormer.py
 crysnet/layers/graphtransformer.py
+crysnet/layers/grover.py
 crysnet/layers/mpnntransformer.py
 crysnet/layers/partitionpaddinglayer.py
 crysnet/layers/readout.py
