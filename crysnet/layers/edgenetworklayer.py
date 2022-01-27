@@ -97,6 +97,40 @@ class SphericalBasisLayer(layers.Layer):
         return phi_theta, edges_neighbor
 
 
+    def sph_harm_func(self, phi_theta):
+        phi = phi_theta[:, 0]
+        theta = phi_theta[:, 1]
+        Ylm = tf.stack([
+                evaluate_spherical_harmonics(l, m, theta, phi) for l in range(self.num_spherical) for m in range(-l, l + 1)])
+        sph_harm_features = tf.transpose(Ylm, perm=(1, 0))
+        return sph_harm_features
+
+        
+    def call(self, inputs):
+        """
+        Parameters
+        ----------
+        inputs : theta and phi of edges in local coordinates.
+
+        Returns
+        -------
+        Ylm : spherical harmonics for local coordinates theta and phi.
+        """
+        local_env, pair_indices = inputs
+        phi_theta, edges_neighbor = self.spherical_coordiates(local_env, pair_indices)
+        # sph_harm_features = tf.cast(self.sph_harm_func(1,0,phi_theta[:,0],phi_theta[:,1]).real, dtype=tf.float32)
+        sph_harm_features = self.sph_harm_func(phi_theta)
+        sph_harm_features = tf.matmul(sph_harm_features, self.kernel) + self.bias
+        return sph_harm_features, edges_neighbor
+
+
+    def get_config(self):
+        config = super().get_config()
+        config.update({"units": self.units})
+        config.update({"num_spherical", self.num_spherical})
+        return config
+        
+
 class GlobalSphericalBasisLayer(layers.Layer):
     
     def __init__(self, edge_dim=64,
@@ -177,40 +211,6 @@ class GlobalSphericalBasisLayer(layers.Layer):
         phi_theta = tf.concat([tf.expand_dims(phi, -1), tf.expand_dims(theta, -1)], -1)
         
         return phi_theta
-
-
-    def sph_harm_func(self, phi_theta):
-        phi = phi_theta[:, 0]
-        theta = phi_theta[:, 1]
-        Ylm = tf.stack([
-                evaluate_spherical_harmonics(l, m, theta, phi) for l in range(self.num_spherical) for m in range(-l, l + 1)])
-        sph_harm_features = tf.transpose(Ylm, perm=(1, 0))
-        return sph_harm_features
-
-        
-    def call(self, inputs):
-        """
-        Parameters
-        ----------
-        inputs : theta and phi of edges in local coordinates.
-
-        Returns
-        -------
-        Ylm : spherical harmonics for local coordinates theta and phi.
-        """
-        local_env, pair_indices = inputs
-        phi_theta, edges_neighbor = self.spherical_coordiates(local_env, pair_indices)
-        # sph_harm_features = tf.cast(self.sph_harm_func(1,0,phi_theta[:,0],phi_theta[:,1]).real, dtype=tf.float32)
-        sph_harm_features = self.sph_harm_func(phi_theta)
-        sph_harm_features = tf.matmul(sph_harm_features, self.kernel) + self.bias
-        return sph_harm_features, edges_neighbor
-
-
-    def get_config(self):
-        config = super().get_config()
-        config.update({"units": self.units})
-        config.update({"num_spherical", self.num_spherical})
-        return config
 
 
     def sph_harm_func(self, phi_theta):
