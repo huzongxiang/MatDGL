@@ -16,7 +16,7 @@ from crysnet.callbacks.cosineannealing import WarmUpCosineDecayScheduler
 import matplotlib.pyplot as plt
 from scipy import interp
 from sklearn.metrics import roc_curve
-from sklearn.metrics import auc
+from sklearn.metrics import auc, r2_score
 
 
 ModulePath = Path(__file__).parent.absolute()
@@ -64,7 +64,8 @@ class GNN:
         return getattr(self.gnn, attr)
 
 
-    def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
+    def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None, load_weights=False, patience=500,
+            verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
         
         gnn = self.gnn
         if self.regression:
@@ -110,7 +111,7 @@ class GNN:
                 filepath = Path(workdir/"model"/train_data.task_type/"gnn_{epoch:02d}-{val_AUC:.3f}.hdf5")
                 checkpoint = ModelCheckpoint(filepath, monitor='val_AUC', save_best_only=True, save_weights_only=save_weights_only, verbose=verbose, mode='max')
 
-            earlystop = EarlyStopping(monitor='val_loss', patience=200, verbose=verbose, mode='min')
+            earlystop = EarlyStopping(monitor='val_loss', patience=patience, verbose=verbose, mode='min')
 
             if warm_up:
                 sample_count = train_data.data_size
@@ -324,6 +325,8 @@ def plot_mae(gnn, test_data, path, name='test'):
     print('predict')
     name = test_data.task_type + '_' + name
     y_pred_keras = gnn.predict(test_data).ravel()
+    r2 = r2_score(test_data.labels, y_pred_keras)
+    print('r2 score', r2)
     plt.figure(figsize=(10, 6))
     plt.scatter(test_data.labels, y_pred_keras)
     plt.plot([0, 8], [0, 8], 'k--')
@@ -344,4 +347,4 @@ def plot_warm_up_lr(warm_up_lr, total_steps, lr, path):
     # plt.xticks(np.arange(0, epochs, 1))
     plt.grid()
     plt.title('Cosine decay with warmup', fontsize=20)
-    plt.savefig(Path(path/"results"/"cosine_decay.png"))    
+    plt.savefig(Path(path/"results"/"cosine_decay.png"))
