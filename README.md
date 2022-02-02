@@ -33,7 +33,7 @@ CrysNet can be installed easily through anaconda! As follows:
       conda install tensorflow-gpu==2.6.0  # for CPU conda install tensorflow==2.6.0
 ```
 
-*If your conda can't find tensorflow-gpu==2.6.0, you can add a new source, e.g.:*
+If your conda can't find tensorflow-gpu==2.6.0, you can add a new source, e.g.:  
 ```bash
       conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/  
       conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/  
