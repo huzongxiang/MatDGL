@@ -1,12 +1,12 @@
 Metadata-Version: 2.1
 Name: crysnet
-Version: 0.1.9
+Version: 0.2.0
 Summary: Labelled Graph Networks for machine learning of crystal.
 Home-page: UNKNOWN
 Author: Zongxiang Hu
 Author-email: huzongxiang@yahoo.com
 License: BSD
-Download-URL: https://github.com/huzongxiang/CrysNetwork
+Download-URL: https://github.com/huzongxiang/CrysNetwork/tree/main/crysnet
 Keywords: materials,science,machine,learning,deep,graph,networks,neural,transformer,massagepassing,topology,tight,bingding,twisted,graphene
 Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
@@ -85,7 +85,7 @@ If your conda can't find tensorflow-gpu==2.6.0, you can add a new source, e.g.:
 CrysNet is very easy to use!  
 Just ***three steps*** can finish a fast test using crysnet:
 + **download test data**  
-Get test datas from https://github.com/huzongxiang/CrysNetwork/datas/  
+Get test datas from https://github.com/huzongxiang/CrysNetwork/tree/main/datas/    
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
