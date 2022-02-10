@@ -1,5 +1,5 @@
 # CrystalNet
-GrystalNet is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science.  
+CrystalNet is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science.  
 
 ## Table of Contents
 

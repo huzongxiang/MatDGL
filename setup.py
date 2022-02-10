@@ -10,13 +10,13 @@ with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='crysnet',
-    version='0.2.1',
+    version='0.2.2',
     description='Labelled Graph Networks for machine learning of crystal.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Zongxiang Hu',
     author_email='huzongxiang@yahoo.com',
-    download_url='https://github.com/huzongxiang/CrysNetwork/tree/main/crysnet',
+    download_url='https://github.com/huzongxiang/CrystalNetwork/tree/main/crysnet',
     license='BSD',
     install_requires=['numpy', "scikit-learn"],
     packages=find_packages(),
