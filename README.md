@@ -1,4 +1,5 @@
 ![](https://img.shields.io/badge/license-BSD--2--Clause-green)
+![](https://img.shields.io/badge/build-passing-brightgreen)
 
 # CrysNet
 GrysNet is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
