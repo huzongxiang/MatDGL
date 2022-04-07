@@ -10,7 +10,7 @@ with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='crysnet',
-    version='0.2.2',
+    version='0.2.3',
     description='Labelled Graph Networks for machine learning of crystal.',
     long_description=long_description,
     long_description_content_type='text/markdown',
