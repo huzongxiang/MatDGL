@@ -6,6 +6,7 @@ Created on Mon Dec 20 15:15:31 2021
 """
 
 
+from ast import Not
 import numpy as np
 from pathlib import Path
 import tensorflow as tf
@@ -16,7 +17,7 @@ from crysnet.callbacks.cosineannealing import WarmUpCosineDecayScheduler
 import matplotlib.pyplot as plt
 from scipy import interp
 from sklearn.metrics import roc_curve
-from sklearn.metrics import auc
+from sklearn.metrics import auc, r2_score
 
 
 ModulePath = Path(__file__).parent.absolute()
@@ -64,14 +65,15 @@ class GNN:
         return getattr(self.gnn, attr)
 
 
-    def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
+    def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None, load_weights=False, patience=500,
+            verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
         
         gnn = self.gnn
         if self.regression:
             gnn.compile(
                 loss=keras.losses.MeanAbsoluteError(),
                 optimizer=self.optimizer,
-                metrics=[keras.metrics.MeanAbsoluteError(name='mae')],
+                metrics=[keras.metrics.MeanAbsoluteError(name="mae")],
             )
         elif self.multiclassification:
             gnn.compile(
@@ -110,7 +112,7 @@ class GNN:
                 filepath = Path(workdir/"model"/train_data.task_type/"gnn_{epoch:02d}-{val_AUC:.3f}.hdf5")
                 checkpoint = ModelCheckpoint(filepath, monitor='val_AUC', save_best_only=True, save_weights_only=save_weights_only, verbose=verbose, mode='max')
 
-            earlystop = EarlyStopping(monitor='val_loss', patience=200, verbose=verbose, mode='min')
+            earlystop = EarlyStopping(monitor='val_loss', patience=patience, verbose=verbose, mode='min')
 
             if warm_up:
                 sample_count = train_data.data_size
@@ -141,7 +143,7 @@ class GNN:
             steps_per_train = None
             steps_per_val = None
 
-        print('gnn fit')
+        print("gnn fit")
         history = gnn.fit(
             train_data,
             validation_data=valid_data,
@@ -171,18 +173,18 @@ class GNN:
         return gnn
 
 
-    def predict_datas(self, test_data, workdir=None, load_weights='default'):
-        print('load weights and predict...')
+    def predict_datas(self, test_data, workdir=None):
+        print("load weights and predict...")
         save_file = test_data.task_type + ".hdf5"
-        if load_weights:
-            best_checkpoint = Path(ModulePath/"model"/save_file)
-        else:
+        if workdir:
             best_checkpoint = Path(workdir/"model"/save_file)
-        gnn = self.gnn()
+        else:
+            best_checkpoint = Path(ModulePath/"model"/save_file)
+        gnn = self.gnn
         gnn.load_weights(best_checkpoint)
         Path(workdir/"results").mkdir(exist_ok=True)
         if self.regression:
-            plot_mae(gnn, test_data, name='test')
+            plot_mae(gnn, test_data, workdir, name='test')
         else:
             if self.multiclassification:
                 plot_auc_multiclassification(gnn, test_data, self.multiclassification, workdir, name='test')
@@ -190,21 +192,21 @@ class GNN:
                 plot_auc(gnn, test_data, name='test')      
 
 
-    def predict(self, data, workdir=None, load_weights='default'):
-        print('load weights and predict...')
+    def predict(self, data, workdir=None):
+        print("load weights and predict...")
         save_file = data.task_type + ".hdf5"
-        if load_weights:
-            best_checkpoint = Path(ModulePath/"model"/save_file)
-        else:
+        if workdir:
             best_checkpoint = Path(workdir/"model"/save_file)
-        gnn = self.gnn()
+        else:
+            best_checkpoint = Path(ModulePath/"model"/save_file)
+        gnn = self.gnn
         gnn.load_weights(best_checkpoint)
         y_pred_keras = gnn.predict(data).ravel()
         return y_pred_keras
 
 
 def plot_train(history, name, path):
-    print('plot curve of training')
+    print("plot curve of training")
     plt.figure(figsize=(10, 12))
     plt.subplot(2,1,1)
     plt.plot(history.history["AUC"], label="train AUC")
@@ -223,7 +225,7 @@ def plot_train(history, name, path):
 
 
 def plot_train_regression(history, name, path):
-    print('plot curve of training')
+    print("plot curve of training")
     plt.figure(figsize=(10, 12))
     plt.subplot(2,1,1)
     plt.plot(history.history["mae"], label="train mae")
@@ -241,37 +243,38 @@ def plot_train_regression(history, name, path):
     plt.savefig(path/"results"/save_path)
 
 
-def plot_auc(gnn, test_data, path, name='test'):
-    print('predict')
+def plot_auc(gnn, test_data, path, name="test"):
+    print("predict")
     name = test_data.task_type + '_' + name
     y_pred_keras = gnn.predict(test_data).ravel()
     fpr_keras, tpr_keras, _ = roc_curve(test_data.labels, y_pred_keras)
     auc_keras = auc(fpr_keras, tpr_keras)
+    print("auc on test data: ", auc_keras)
     plt.figure(figsize=(10, 6))
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.plot(fpr_keras, tpr_keras, label='Keras (area = {:.3f})'.format(auc_keras))
-    plt.xlabel('False positive rate')
-    plt.ylabel('True positive rate')
-    plt.title('ROC curve test')
-    plt.legend(loc='best')
+    plt.plot(fpr_keras, tpr_keras, label="Keras (area = {:.3f})".format(auc_keras))
+    plt.xlabel("False positive rate")
+    plt.ylabel("True positive rate")
+    plt.title("ROC curve test")
+    plt.legend(loc="best")
     save_path = name + "_predict" + ".png"
     plt.savefig(Path(path/"results"/save_path))
 
 
-def plot_auc_multiclassification(gnn, test_data, n_classes, path, name='test'):
-    print('predict')
-    name = test_data.task_type + '_' + name
-    y_pred_keras = gnn.predict(test_data)
+def plot_auc_multiclassification(gnn, datas, n_classes, path, name="test"):
+    print("predict")
+    name = datas.task_type + '_' + name
+    y_pred_keras = gnn.predict(datas)
 
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
     for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(test_data.labels[:, i], y_pred_keras[:, i])
+        fpr[i], tpr[i], _ = roc_curve(datas.labels[:, i], y_pred_keras[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
     # Compute micro-average ROC curve and ROC area
-    fpr["micro"], tpr["micro"], _ = roc_curve(np.array(test_data.labels)[:, i], y_pred_keras[:, i])
+    fpr["micro"], tpr["micro"], _ = roc_curve(np.array(datas.labels)[:, i], y_pred_keras[:, i])
     roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
     # Compute macro-average ROC curve and ROC area
@@ -304,6 +307,7 @@ def plot_auc_multiclassification(gnn, test_data, n_classes, path, name='test'):
             color='navy', linestyle=':', linewidth=4)
 
     for i in range(n_classes):
+        print("auc on ", name, " datas: class", i, " auc: ", roc_auc[i])
         plt.plot(fpr[i], tpr[i], lw=2,
                 label='ROC curve of class {0} (area = {1:0.2f})'
                 ''.format(i, roc_auc[i]))
@@ -311,24 +315,28 @@ def plot_auc_multiclassification(gnn, test_data, n_classes, path, name='test'):
     plt.plot([0, 1], [0, 1], 'k--', lw=2)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Some extension of Receiver operating characteristic to multi-class')
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Some extension of Receiver operating characteristic to multi-class")
     plt.legend(loc="lower right")
 
     save_path = name + "_predict" + ".png"
     plt.savefig(Path(path/"results"/save_path))
 
 
-def plot_mae(gnn, test_data, path, name='test'):
+def plot_mae(gnn, test_data, path, name="test"):
     print('predict')
     name = test_data.task_type + '_' + name
     y_pred_keras = gnn.predict(test_data).ravel()
+    r2 = r2_score(test_data.labels, y_pred_keras)
+    axis_min = np.mean(test_data.labels) - np.std(test_data.labels)
+    axis_max = np.mean(test_data.labels) + np.std(test_data.labels)
+    print("r2 score: ", r2)
     plt.figure(figsize=(10, 6))
-    plt.scatter(test_data.labels, y_pred_keras)
-    plt.plot([0, 8], [0, 8], 'k--')
-    plt.xlim(-4, 4)
-    plt.ylim(-4, 4)
+    plt.scatter(test_data.labels, y_pred_keras, color="orange")
+    plt.plot([-2, 6], [-2, 6], 'r--')
+    plt.xlim(axis_min, axis_max)
+    plt.ylim(axis_min, axis_max)
     plt.xlabel("experimetal", fontsize=16)
     plt.ylabel("pred", fontsize=16)
     plt.title('predicted')
@@ -338,10 +346,10 @@ def plot_mae(gnn, test_data, path, name='test'):
 
 def plot_warm_up_lr(warm_up_lr, total_steps, lr, path):
     plt.plot(warm_up_lr.learning_rates)
-    plt.xlabel('Step', fontsize=20)
-    plt.ylabel('lr', fontsize=20)
+    plt.xlabel("Step", fontsize=20)
+    plt.ylabel("lr", fontsize=20)
     plt.axis([0, total_steps, 0, lr*1.1])
     # plt.xticks(np.arange(0, epochs, 1))
     plt.grid()
-    plt.title('Cosine decay with warmup', fontsize=20)
-    plt.savefig(Path(path/"results"/"cosine_decay.png"))    
+    plt.title("Cosine decay with warmup", fontsize=20)
+    plt.savefig(Path(path/"results"/"cosine_decay.png"))
