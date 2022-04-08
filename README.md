@@ -389,6 +389,6 @@ Zongxiang Hu
 
 <a name="Contact"></a>
 ## Contact
-Please contact  if you have any questions.  
+Please contact me if you have any questions.  
 Mail: huzongxiang@yahoo.com  
 Wechat: voodoozx2015
