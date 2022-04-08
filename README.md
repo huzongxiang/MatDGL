@@ -17,7 +17,7 @@ GrysNet is a neural network package that allows researchers to train custom mode
 * [Framework](#crysnet-framework)
 * [Contributors](#contributors)
 * [References](#references)
-* [Help](#help)
+* [Contact](#Contact)
 
 <a name="Hightlights"></a>
 ## Hightlights
@@ -387,7 +387,8 @@ Zongxiang Hu
 ## References
 
 
-<a name="Help"></a>
-## Help
-mail: huzongxiang@yahoo.com
-wechat: voodoozx2015
+<a name="Contact"></a>
+## Contact
+Please contact  if you have any questions.  
+Mail: huzongxiang@yahoo.com  
+Wechat: voodoozx2015
