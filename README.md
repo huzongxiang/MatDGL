@@ -2,6 +2,8 @@
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/pypi/v/crysnet)
 ![](https://img.shields.io/pypi/dm/crysnet)
+![](https://img.shields.io/badge/python-3.8-blue)
+![](https://img.shields.io/badge/tensorflow-2.6.0-red)
 ![](https://img.shields.io/github/stars/huzongxiang/CrystalNetwork?style=social)
 
 # CrysNet
@@ -15,6 +17,7 @@ GrysNet is a neural network package that allows researchers to train custom mode
 * [Framework](#crysnet-framework)
 * [Contributors](#contributors)
 * [References](#references)
+* [Help](#help)
 
 <a name="Hightlights"></a>
 ## Hightlights
@@ -382,3 +385,9 @@ Zongxiang Hu
 
 <a name="References"></a>
 ## References
+
+
+<a name="Help"></a>
+## Help
+mail: huzongxiang@yahoo.com
+wechat: voodoozx2015
