@@ -74,7 +74,7 @@ Download datas and put it in your trainning work directory, test.py file should 
 + **run command**  
 run command:  
 ```bash
-      python test.py  
+python test.py  
 ```
 You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in /results and /models, respectively.
 

@@ -6,4 +6,4 @@ Created on Tue Oct 12 20:27:50 2021
 
 @author: huzongxiang
 """
-__version__ = "0.2.6"
+__version__ = "0.2.7"
