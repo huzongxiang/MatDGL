@@ -49,10 +49,10 @@ CrysNet can be installed easily through anaconda! As follows:
 
 + Install other dependencies:  
 ```bash
-      pip install mendeleev  
-      pip install graphviz  
-      pip install pydot  
-      pip install sklearn
+      conda install --channel conda-forge mendeleev  
+      conda install --channel conda-forge graphviz  
+      conda install --channel conda-forge pydot  
+      conda install --channel conda-forge sklearn
 ```
 
 + Install crysnet:  
