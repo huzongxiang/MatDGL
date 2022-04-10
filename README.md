@@ -32,32 +32,32 @@ CrysNet can be installed easily through anaconda! As follows:
 
 + Create a new conda environment named "crysnet" by command, then activate environment "crysnet":    
 ```bash
-      conda create -n crysnet python=3.8  
-      conda activate crysnet 
+conda create -n crysnet python=3.8  
+conda activate crysnet 
 ```
    It's necessary to create a new conda environment to aviod bugs causing by version conflict.   
  
 + Configure dependencies of crysnet:
 ```bash
-      conda install -c conda-forge tensorflow-gpu==2.6.0
+conda install -c conda-forge tensorflow-gpu==2.6.0
 ```
 
 + Install pymatgen:  
 ```bash
-      conda install --channel conda-forge pymatgen  
+conda install --channel conda-forge pymatgen  
 ```   
 
 + Install other dependencies:  
 ```bash
-      conda install --channel conda-forge mendeleev  
-      conda install --channel conda-forge graphviz  
-      conda install --channel conda-forge pydot  
-      conda install --channel conda-forge sklearn
+conda install --channel conda-forge mendeleev  
+conda install --channel conda-forge graphviz  
+conda install --channel conda-forge pydot  
+conda install --channel conda-forge sklearn
 ```
 
 + Install crysnet:  
 ```bash
-      pip install crysnet  
+pip install crysnet  
 ```
       
 
