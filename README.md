@@ -265,7 +265,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		regression=False,
 		multiclassification=None,)
 	gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)  
-	```
+	```  
     You can set edge as your model output.  
 	```python
 	from crysnet.layers import EdgeMessagePassing
@@ -326,7 +326,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		outputs=[x],
 		)
 		return model
-	```
+	```  
 
     The Module GNN has some basic parameter necessary to be defined but not necessary to be used：  
 	```python
@@ -346,7 +346,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 			):
 			"""
 			pass
-			"""
+			"""  
 	```  
 
 
