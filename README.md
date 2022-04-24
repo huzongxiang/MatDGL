@@ -331,7 +331,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	The Module GNN has some basic parameter necessary to be defined but not necessary to be used:  
 	```python
 	class GNN:
-		def __init__(self,
+	    def __init__(self,
 			model: Model,
 			atom_dim=16,
 			bond_dim=32,
