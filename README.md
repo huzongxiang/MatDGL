@@ -332,21 +332,21 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	```python
 	class GNN:
 		def __init__(self,
-		model: Model,
-		atom_dim=16,
-		bond_dim=32,
-		num_atom=118,
-		state_dim=16,
-		sp_dim=230,
-		batch_size=16,
-		regression=True,
-		optimizer = 'Adam',
-		multiclassification=None,
-		**kwargs,
-		):
-		"""
-		pass
-		"""
+			model: Model,
+			atom_dim=16,
+			bond_dim=32,
+			num_atom=118,
+			state_dim=16,
+			sp_dim=230,
+			batch_size=16,
+			regression=True,
+			optimizer = 'Adam',
+			multiclassification=None,
+			**kwargs,
+			):
+			"""
+			pass
+			"""
 	```
 
 
