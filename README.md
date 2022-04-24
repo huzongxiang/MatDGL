@@ -31,10 +31,10 @@ GrysNet is a neural network package that allows researchers to train custom mode
 CrysNet can be installed easily through anaconda! As follows:
 
 + Create a new conda environment named "crysnet" by command, then activate environment "crysnet":    
-      ```bash
-      conda create -n crysnet python=3.8  
-      conda activate crysnet 
-      ```
+    ```bash
+    conda create -n crysnet python=3.8  
+    conda activate crysnet 
+    ```  
    It's necessary to create a new conda environment to aviod bugs causing by version conflict.   
  
 + Configure dependencies of crysnet:
@@ -43,23 +43,23 @@ CrysNet can be installed easily through anaconda! As follows:
       ```
 
 + Install pymatgen:  
-      ```bash
-      conda install --channel conda-forge pymatgen  
-      ```   
+```bash
+conda install --channel conda-forge pymatgen  
+```   
 
 + Install other dependencies:  
-      ```bash
-      conda install --channel conda-forge mendeleev  
-      conda install --channel conda-forge graphviz  
-      conda install --channel conda-forge pydot  
-      conda install --channel conda-forge sklearn
-      ```
+    ```bash
+    conda install --channel conda-forge mendeleev  
+    conda install --channel conda-forge graphviz  
+    conda install --channel conda-forge pydot  
+    conda install --channel conda-forge sklearn
+    ```   
 
 + Install crysnet:  
-      ```bash
-      pip install crysnet  
-      ```
-      
+    ```bash
+    pip install crysnet  
+    ```  
+  
 
 <a name="Usage"></a>
 ## Usage
