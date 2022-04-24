@@ -63,7 +63,7 @@ CrysNet can be installed easily through anaconda! As follows:
 
 <a name="Usage"></a>
 ## Usage
-### Fast testing soon
+### Quick start
 CrysNet is very easy to use!  
 Just ***three steps*** can finish a fast test using crysnet:
 + **download test data**  
