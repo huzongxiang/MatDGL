@@ -347,7 +347,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 			"""
 			pass
 			"""
-	```
+	```  
 
 
 <a name="Crysnet-framework"></a>
