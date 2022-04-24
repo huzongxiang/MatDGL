@@ -328,7 +328,7 @@ You can set edge as your model output.
 		return model
 	```  
 
-The Module GNN has some basic parameter necessary to be defined but not necessary to be used：  
+The Module GNN has some basic parameter necessary to be defined but not necessary to be used:  
 	```python
 	class GNN:
 		def __init__(self,
