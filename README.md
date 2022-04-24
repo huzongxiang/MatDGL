@@ -212,8 +212,6 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 				message_steps=1,
 				readout_units=64,
 				batch_size=16,
-				regression=False,
-				multiclassification=None,
 				):
 				atom_features = layers.Input((), dtype="int32", name="atom_features_input")
 				atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
@@ -239,24 +237,11 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 					atom_graph_indices, bond_graph_indices]
 				)
 
-				x = x[0]
-
-				x = PartitionPadding(batch_size)([x, atom_graph_indices])
-
+				x = PartitionPadding(batch_size)([x[0], atom_graph_indices])
 				x = layers.BatchNormalization()(x)
-
 				x = layers.GlobalAveragePooling1D()(x)
-
 				x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
-
-				x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
-
-				if regression:
-					x = layers.Dense(1, name='final')(x)
-				elif multiclassification is not None:
-					x = layers.Dense(multiclassification, activation="softmax", name='final_softmax')(x)
-				else:
-					x = layers.Dense(1, activation="sigmoid", name='final')(x)
+				x = layers.Dense(1, activation="sigmoid", name='final')(x)
 
 				model = Model(
 				inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
