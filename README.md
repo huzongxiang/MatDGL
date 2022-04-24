@@ -203,131 +203,129 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	from crysnet.layers import PartitionPadding
 
 	def MyModel(
-				bond_dim,
-				atom_dim=16,
-				num_atom=118,
-				state_dim=16,
-				sp_dim=230,
-				units=32,
-				message_steps=1,
-				readout_units=64,
-				batch_size=16,
-				):
-				atom_features = layers.Input((), dtype="int32", name="atom_features_input")
-				atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
-				bond_features = layers.Input((bond_dim), dtype="float32", name="bond_features")
-				local_env = layers.Input((6), dtype="float32", name="local_env")
-				state_attrs = layers.Input((), dtype="int32", name="state_attrs_input")   
-				state_attrs_ = layers.Embedding(sp_dim, state_dim, dtype="float32", name="state_attrs")(state_attrs)
+			bond_dim,
+			atom_dim=16,
+			num_atom=118,
+			state_dim=16,
+			sp_dim=230,
+			units=32,
+			message_steps=1,
+			readout_units=64,
+			batch_size=16,
+			):
+			atom_features = layers.Input((), dtype="int32", name="atom_features_input")
+			atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
+			bond_features = layers.Input((bond_dim), dtype="float32", name="bond_features")
+			local_env = layers.Input((6), dtype="float32", name="local_env")
+			state_attrs = layers.Input((), dtype="int32", name="state_attrs_input")   
+			state_attrs_ = layers.Embedding(sp_dim, state_dim, dtype="float32", name="state_attrs")(state_attrs)
 
-				pair_indices = layers.Input((2), dtype="int32", name="pair_indices")
+			pair_indices = layers.Input((2), dtype="int32", name="pair_indices")
 
-				atom_graph_indices = layers.Input(
-				(), dtype="int32", name="atom_graph_indices"
-				)
+			atom_graph_indices = layers.Input(
+			(), dtype="int32", name="atom_graph_indices"
+			)
 
-				bond_graph_indices = layers.Input(
-				(), dtype="int32", name="bond_graph_indices"
-				)
+			bond_graph_indices = layers.Input(
+			(), dtype="int32", name="bond_graph_indices"
+			)
 
-				pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
+			pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-				x = MessagePassing(message_steps)(
-				[atom_features_, edge_features, state_attrs_, pair_indices,
-					atom_graph_indices, bond_graph_indices]
-				)
+			x = MessagePassing(message_steps)(
+			[atom_features_, edge_features, state_attrs_, pair_indices,
+				atom_graph_indices, bond_graph_indices]
+			)
 
-				x = PartitionPadding(batch_size)([x[0], atom_graph_indices])
-				x = layers.BatchNormalization()(x)
-				x = layers.GlobalAveragePooling1D()(x)
-				x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
-				x = layers.Dense(1, activation="sigmoid", name='final')(x)
+			x = PartitionPadding(batch_size)([x[0], atom_graph_indices])
+			x = layers.BatchNormalization()(x)
+			x = layers.GlobalAveragePooling1D()(x)
+			x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
+			x = layers.Dense(1, activation="sigmoid", name='final')(x)
 
-				model = Model(
-				inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
-							bond_graph_indices, pair_indices_per_graph],
-				outputs=[x],
-				)
-				return model
+			model = Model(
+			inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
+						bond_graph_indices, pair_indices_per_graph],
+			outputs=[x],
+			)
+			return model
 
 	from crysnet.models import GNN
-	gnn = GNN(model=MyModel,        
-				atom_dim=16,
-				bond_dim=64,
-				num_atom=118,
-				state_dim=16,
-				sp_dim=230,
-				units=32,
-				message_steps=1,
-				readout_units=64,
-				batch_size=16,
-				optimizer='Adam',
-				regression=False,
-				multiclassification=None,)
-	gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
+	gnn = GNN(model=MyModel,     
+			atom_dim=16,
+			bond_dim=64,
+			num_atom=118,
+			state_dim=16,
+			sp_dim=230,
+			units=32,
+			message_steps=1,
+			readout_units=64,
+			batch_size=16,
+			optimizer='Adam',
+			regression=False,
+			multiclassification=None,)
+	gnn.train(train_data, valid_data, test_data, epochs=700, lr=3e-3, warm_up=True, load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)  
 	```
     You can set edge as your model output.  
 	```python
 	from crysnet.layers import EdgeMessagePassing
 	def MyModel(
-				bond_dim,
-				atom_dim=16,
-				num_atom=118,
-				state_dim=16,
-				sp_dim=230,
-				units=32,
-				message_steps=1,
-				readout_units=64,
-				batch_size=16,
-				regression=False,
-				multiclassification=None,
-				):
-				atom_features = layers.Input((), dtype="int32", name="atom_features_input")
-				atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
-				bond_features = layers.Input((bond_dim), dtype="float32", name="bond_features")
-				local_env = layers.Input((6), dtype="float32", name="local_env")
-				state_attrs = layers.Input((), dtype="int32", name="state_attrs_input")   
-				state_attrs_ = layers.Embedding(sp_dim, state_dim, dtype="float32", name="state_attrs")(state_attrs)
+			bond_dim,
+			atom_dim=16,
+			num_atom=118,
+			state_dim=16,
+			sp_dim=230,
+			units=32,
+			message_steps=1,
+			readout_units=64,
+			batch_size=16,
+			regression=False,
+			multiclassification=None,
+			):
+			atom_features = layers.Input((), dtype="int32", name="atom_features_input")
+			atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
+			bond_features = layers.Input((bond_dim), dtype="float32", name="bond_features")
+			local_env = layers.Input((6), dtype="float32", name="local_env")
+			state_attrs = layers.Input((), dtype="int32", name="state_attrs_input")   
+			state_attrs_ = layers.Embedding(sp_dim, state_dim, dtype="float32", name="state_attrs")(state_attrs)
 
-				pair_indices = layers.Input((2), dtype="int32", name="pair_indices")
+			pair_indices = layers.Input((2), dtype="int32", name="pair_indices")
 
-				atom_graph_indices = layers.Input(
-				(), dtype="int32", name="atom_graph_indices"
-				)
+			atom_graph_indices = layers.Input(
+			(), dtype="int32", name="atom_graph_indices"
+			)
 
-				bond_graph_indices = layers.Input(
-				(), dtype="int32", name="bond_graph_indices"
-				)
+			bond_graph_indices = layers.Input(
+			(), dtype="int32", name="bond_graph_indices"
+			)
 
-				pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
+			pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
-				x = EdgeMessagePassing(units,
-										edge_steps,
-										kernel_regularizer=l2(reg0),
-										sph=spherical_harmonics
-										)([bond_features, local_env, pair_indices])
+			x = EdgeMessagePassing(units,
+									edge_steps,
+									kernel_regularizer=l2(reg0),
+									sph=spherical_harmonics
+									)([bond_features, local_env, pair_indices])
 
-				x = x[1]
+			x = PartitionPadding(batch_size)([x[1], bond_graph_indices])
 
-				x = PartitionPadding(batch_size)([x, bond_graph_indices])
+			x = layers.BatchNormalization()(x)
 
-				x = layers.BatchNormalization()(x)
+			x = layers.GlobalAveragePooling1D()(x)
 
-				x = layers.GlobalAveragePooling1D()(x)
+			x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
 
-				x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
+			x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
 
-				x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
+			if regression:
+				x = layers.Dense(1, name='final')(x)
 
-				if regression:
-					x = layers.Dense(1, name='final')(x)
-
-				model = Model(
-				inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
-							bond_graph_indices, pair_indices_per_graph],
-				outputs=[x],
-				)
-				return model
+			model = Model(
+			inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
+						bond_graph_indices, pair_indices_per_graph],
+			outputs=[x],
+			)
+			return model
 	```
 
     The Module GNN has some basic parameter necessary to be defined but not necessary to be used：  
