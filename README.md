@@ -300,10 +300,10 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
 		x = EdgeMessagePassing(units,
-						edge_steps,
-						kernel_regularizer=l2(reg0),
-						sph=spherical_harmonics
-						)([bond_features, local_env, pair_indices])
+				edge_steps,
+				kernel_regularizer=l2(reg0),
+				sph=spherical_harmonics
+				)([bond_features, local_env, pair_indices])
 
 		x = PartitionPadding(batch_size)([x[1], bond_graph_indices])
 		x = layers.BatchNormalization()(x)
