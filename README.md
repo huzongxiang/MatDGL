@@ -279,8 +279,6 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		message_steps=1,
 		readout_units=64,
 		batch_size=16,
-		regression=False,
-		multiclassification=None,
 		):
 		atom_features = layers.Input((), dtype="int32", name="atom_features_input")
 		atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
@@ -302,23 +300,17 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		pair_indices_per_graph = layers.Input((2), dtype="int32", name="pair_indices_per_graph")
 
 		x = EdgeMessagePassing(units,
-								edge_steps,
-								kernel_regularizer=l2(reg0),
-								sph=spherical_harmonics
-								)([bond_features, local_env, pair_indices])
+						edge_steps,
+						kernel_regularizer=l2(reg0),
+						sph=spherical_harmonics
+						)([bond_features, local_env, pair_indices])
 
 		x = PartitionPadding(batch_size)([x[1], bond_graph_indices])
-
 		x = layers.BatchNormalization()(x)
-
 		x = layers.GlobalAveragePooling1D()(x)
-
 		x = layers.Dense(readout_units, activation="relu", name='readout0')(x)
-
 		x = layers.Dense(readout_units//2, activation="relu", name='readout1')(x)
-
-		if regression:
-			x = layers.Dense(1, name='final')(x)
+		x = layers.Dense(1, name='final')(x)
 
 		model = Model(
 		inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
