@@ -350,7 +350,7 @@ CrysNet
 
 <a name="Implemented-models"></a>
 ## Implemented-models  
-We list currently supported GNN models, layers and operators according to category:
+We list currently supported GNN models:
 * **GCN** from Kipf and Welling: [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907) (ICLR 2017)  
 * **GAT** from Veličković *et al.*: [Graph Attention Networks](https://arxiv.org/abs/1710.10903) (ICLR 2018)  
 * **GN** from Battaglia *et al.*: [Relational inductive biases, deep learning, and graph networks](https://arxiv.org/pdf/1806.01261v1.pdf)   
