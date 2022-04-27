@@ -351,9 +351,11 @@ CrysNet
 <a name="Implemented-models"></a>
 ## Implemented-models  
 We list currently supported GNN models, layers and operators according to category:
-* **GCNConv** from Kipf and Welling: [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907) (ICLR 2017)  
-* **ChebConv** from Defferrard *et al.*: [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering](https://arxiv.org/abs/1606.09375) (NIPS 2016)  
-* **GATConv** from Veličković *et al.*: [Graph Attention Networks](https://arxiv.org/abs/1710.10903) (ICLR 2018)  
+* **GCN** from Kipf and Welling: [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907) (ICLR 2017)  
+* **GAT** from Veličković *et al.*: [Graph Attention Networks](https://arxiv.org/abs/1710.10903) (ICLR 2018)  
+* **GN** from Battaglia *et al.*: [Relational inductive biases, deep learning, and graph networks](https://arxiv.org/pdf/1806.01261v1.pdf)   
+* **Transformer** from Vaswani *et al.*: [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf) (NIPS 2017)  
+
 
 <a name="Contributors"></a>
 ## Contributors
