@@ -15,6 +15,7 @@ GrysNet is a neural network package that allows researchers to train custom mode
 * [Installation](#installation)
 * [Usage](#usage)
 * [Framework](#crysnet-framework)
+* [Implemented-models](#implemented-models)
 * [Contributors](#contributors)
 * [References](#references)
 * [Contact](#Contact)
@@ -343,9 +344,16 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 
 
 <a name="Crysnet-framework"></a>
-## Framework
+## Framework  
 CrysNet 
 
+
+<a name="Implemented-models"></a>
+## Implemented-models  
+We list currently supported GNN models, layers and operators according to category:
+* **GCNConv** from Kipf and Welling: [Semi-Supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907) (ICLR 2017)  
+* **ChebConv** from Defferrard *et al.*: [Convolutional Neural Networks on Graphs with Fast Localized Spectral Filtering](https://arxiv.org/abs/1606.09375) (NIPS 2016)  
+* **GATConv** from Veličković *et al.*: [Graph Attention Networks](https://arxiv.org/abs/1710.10903) (ICLR 2018)  
 
 <a name="Contributors"></a>
 ## Contributors
