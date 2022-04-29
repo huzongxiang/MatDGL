@@ -117,7 +117,7 @@ BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas you
 Module GNN defines a trainning framework that accepts a series of models. Crysnet provides a series of mainstream models as your need.  
 	```python
 	from crysnet.models import GNN
-	from crysnet.models.graphmodel import MpnnBaseModel, TransformerBaseModel, CgcnnModel, GraphAttentionModel
+	from crysnet.models.gnnmodel import MpnnBaseModel, TransformerBaseModel, CgcnnModel, GraphAttentionModel
 
 	gnn = GNN(model=MpnnBaseModel,
 		atom_dim=16
