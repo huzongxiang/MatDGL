@@ -192,7 +192,7 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
  We provide GraphModel, MpnnBaseModel, TransformerBaseModel, MpnnModel, TransformerModel, DirectionalMpnnModel, DirectionalTransformerModel and CGCNN model according to your demends. TransformerModel, GraphModel and MpnnModel are different models. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel. MpnnBaseModel and TransformerBaseModel don't take directional informations of crystal into count so them run faster. MpnnBaseModel is the fastest model but accuracy is enough for most tasks. TransformerModel can achieve the hightest accuracy in most tasks. The CGCNN model is the crystal graph convolution neural network model. The GraphAttentionModel is the graph attention neural network.  
 	```python
 	from crysnet.models import GNN
-	from crysnet.models.graphmodel import MpnnBaseModel, TransformerBaseModel , DirectionalMpnnModel, DirectionalTransformerModel, MpnnModel, TransformerModel, GraphModel, CgcnnModel, GraphAttentionModel
+	from crysnet.models.gnnmodel import MpnnBaseModel, TransformerBaseModel , DirectionalMpnnModel, DirectionalTransformerModel, MpnnModel, TransformerModel, GraphModel, CgcnnModel, GraphAttentionModel
 	```
 
 + **custom your model and trainning**  
