@@ -6,9 +6,12 @@ Created on Thu Jun  3 14:56:51 2021
 """
 
 
+
 import os
 import json
+import pickle
 import requests
+from asyncore import write
 from tqdm import tqdm
 import numpy as np
 from pathlib import Path
@@ -24,7 +27,7 @@ class Dataset:
     """
     Accessing materialsproject.org by api.
     """
-    def __init__(self, task_type=None, data_path=None, api_key=None):
+    def __init__(self, task_type=None, data_path=None, predict=False, api_key=None):
         if task_type not in ['my_regression', 'my_classification', 'my_multiclassification', 'metal', 'band_gap', 'dos_fermi', 'formation_energy', 'formation_energy_all', 'formation_energy', 'e_above_hull', 'topology', 'topology_multi', 'GVRH', 'KVRH', 'possion_ratio', 'regression', 'classification', 'multiclassification']:
             raise ValueError('Invalid task type! Input task_type should be my_regression, my_classification, my_multiclassification, regression, classification, multiclassification, metal, band_gap, dos_fermi, formation_energy, e_above_hull, formation_energy_all, formation_energy, topology, GVRH, KVRH, possion_ratio.')
         
@@ -86,6 +89,9 @@ class Dataset:
             self.regression = False
             self.multiclassification = True
         
+        if predict:
+            self.dataset_file = Path(data_path/"datas"/"dataset_predict.json")
+
         self.structures = None
         self.labels = None
 
@@ -178,7 +184,7 @@ class Dataset:
 
 
     def shuffle_set(self, structures: List=None, labels: List=None) -> List:
-        permuted_indices = np.random.permutation(np.arange(len(labels)))
+        permuted_indices = np.random.permutation(np.arange(len(structures)))
 
         structures_shuffle = []
         labels_shuffle = []
@@ -250,12 +256,22 @@ class Dataset:
             self.structures = structures
         else:
             raise ValueError('strucutres should not be None.')
-        return self.structure
+        return self.structures
     
     
     def prepare_y(self, labels: List=None) -> List:
         self.labels = labels
         return self.labels
+
+    @staticmethod
+    def save_json(data, workdir=None):
+        with open(Path(workdir/"results/file.json"),'w') as f:
+            json.dump(data, f)  
+
+    @staticmethod
+    def savefile(data, workdir=None):
+        with open(Path(workdir/"results/prediction.pkl"),'wb') as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 class TopologicalDataset(Dataset):

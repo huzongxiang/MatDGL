@@ -7,13 +7,14 @@ Created on Tue Nov  2 13:57:46 2021
 
 import warnings
 import logging
+import time
 from pathlib import Path
 import numpy as np
 import tensorflow as tf
 from crysnet.data import Dataset
 from crysnet.models import GNN
-from crysnet.data.generator import GraphGenerator
-from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel
+from crysnet.data.generator import GraphGenerator, GraphGeneratorPredict
+from crysnet.models.gnnmodel import GraphModel, MpnnModel, TransformerModel
 
 
 tf.get_logger().setLevel(logging.ERROR)
@@ -25,21 +26,27 @@ tf.random.set_seed(52)
 ModulePath = Path(__file__).parent.absolute()
 
 print('reading dataset...')
-dataset = Dataset(task_type='topology_multi', data_path=ModulePath)
+start = time.time()
+dataset = Dataset(task_type='topology_multi', data_path=ModulePath, predict=True)
+end = time.time()
+run_time = end - start
 print('done')
+print('run time:  {:.5f} s'.format(run_time))
 print(dataset.dataset_file)
 
 BATCH_SIZE = 16
 DATA_SIZE = None
 CUTOFF = 4.5
 
-Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
-test_data = Generators.test_generator
+# preparing your test data
+# Generators = GraphGenerator(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
+# test_data = Generators.test_generator
 
-# preparing your data
-# data_generator = Generators.generator()
+# preparing your predict data
+Generators = GraphGeneratorPredict(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
+predict_data = Generators.predict_generator
 
-multiclassification = Generators.multiclassification 
+multiclassification = 5
 
 #parameters
 atom_dim=16
@@ -124,4 +131,12 @@ gnn = GNN(model=TransformerModel,
         multiclassification=multiclassification,
         )
 
-gnn.predict_datas(test_data, workdir=ModulePath)
+# gnn.predict_datas(test_data, workdir=ModulePath)
+y_pred_keras = gnn.predict(predict_data, workdir=ModulePath)
+print('total data: ',len(y_pred_keras))
+
+y_dict = {}
+for i, y in enumerate(y_pred_keras):
+    y_dict[i] = y
+
+Dataset.savefile(y_dict, workdir=ModulePath)

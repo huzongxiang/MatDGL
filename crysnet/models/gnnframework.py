@@ -201,7 +201,7 @@ class GNN:
             best_checkpoint = Path(ModulePath/"model"/save_file)
         gnn = self.gnn
         gnn.load_weights(best_checkpoint)
-        y_pred_keras = gnn.predict(data).ravel()
+        y_pred_keras = gnn.predict(data)
         return y_pred_keras
 
 

@@ -72,44 +72,36 @@ class GraphGenerator:
         return train_data, valid_data, test_data
 
 
-    def generator(self):   
-        structures = self.dataset.structures
-        labels = self.dataset.labels
-        task_type = self.dataset.task_type
+class GraphGeneratorPredict:
+    def __init__(self, dataset, data_size=None, batch_size=16, cutoff=3.0, mendeleev=False):
+        self.dataset = dataset
+        self.data_size = data_size
+        self.batch_size = batch_size
+        self.cutoff = cutoff
+        self.mendeleev = mendeleev
+        self.multiclassification = None
+        self.ntarget = 1
 
-        if labels:
-            structures, labels = self.dataset.shuffle_set(structures, labels)
-        else:
-            structures = self.dataset.shuffle_set(structures)
+        self.predict_generator = self.generators()
+
+
+    def generators(self):   
+        structures = self.dataset.structures
+        task_type = self.dataset.task_type
 
         if self.data_size:
             num = self.data_size
             structures_used = structures[:num]
-            if labels:
-                labels_used = labels[:num]
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
         else:
             structures_used = structures
-            if labels:
-                labels_used = labels
-            self.data_size = len(labels_used)
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
+            self.data_size = len(structures_used)
+
+        labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
 
         print('preparing dataset...')
         x_= self.dataset.prepare_x(structures_used)
         x = labelledgraph.inputs_from_strcutre_list(x_)
 
-        if labels:
-            y = self.dataset.prepare_y(labels_used)
-
-            if self.dataset.multiclassification:
-                y = to_categorical(y)
-                self.multiclassification = len(y[0])
-
-            if self.dataset.regression:
-                if isinstance(y[0], list):
-                    self.ntarget = len(y[0])
-
-        data = GraphBatchGeneratorSequence(*x, y, task_type, batch_size=self.batch_size)
+        data = GraphBatchGeneratorSequence(*x, labels=None, task_type=task_type, batch_size=self.batch_size)
 
         return data

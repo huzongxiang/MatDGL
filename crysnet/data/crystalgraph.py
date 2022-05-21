@@ -449,7 +449,7 @@ class LabelledCrystalGraph(LabelledCrystalGraphBase):
         
         end = time.time()
         run_time = end - start
-        print('run time: ', run_time)
+        print('run time:  {:.2f} s'.format(run_time))
         
         return (
             atom_features_list,
@@ -535,7 +535,7 @@ class  GraphBatchGeneratorSequence(Sequence):
 
         x_batch = self._merge_batch(inputs_batch)
         if self.labels is None:
-            return x_batch
+            return (x_batch, )
         y_batch = np.array(get(self.labels))
 
         return x_batch, (y_batch)
@@ -636,20 +636,23 @@ class  GraphBatchGeneratorSequence(Sequence):
 
 
 class  GraphBatchGeneratorFromGraphs(GraphBatchGeneratorSequence):     
-    def __init__(self, graphs: List, labels: List, task_type, batch_size=32):
+    def __init__(self, graphs: List, labels: Union[List, None], task_type, batch_size=32):
         self.graphs = graphs
         self.labels = labels
         self.task_type = task_type
         self.batch_size = batch_size
-        self.data_size = len(labels)
+        self.data_size = len(graphs)
 
 
     def __getitem__(self, index: int) -> tuple:
         structure_batch = self.graphs[index * self.batch_size : (index + 1) * self.batch_size]
-        y_batch = np.array(self.labels[index * self.batch_size : (index + 1) * self.batch_size])
 
         graph_batch = self._inputs_from_graphs(structure_batch)
         x_batch = self._merge_batch(graph_batch)
+
+        if self.labels is None:
+            return (x_batch, )
+        y_batch = np.array(self.labels[index * self.batch_size : (index + 1) * self.batch_size])
         return x_batch, (y_batch)
 
 
