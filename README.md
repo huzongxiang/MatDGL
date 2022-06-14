@@ -7,14 +7,14 @@
 ![](https://img.shields.io/github/stars/huzongxiang/CrystalNetwork?style=social)
 
 # CrysNet
-GrysNet is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
+MatDGL is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
 
 ## Table of Contents
 
 * [Hightlights](#hightlights)
 * [Installation](#installation)
 * [Usage](#usage)
-* [Framework](#crysnet-framework)
+* [Framework](#matdgl-framework)
 * [Implemented-models](#implemented-models)
 * [Contributors](#contributors)
 * [References](#references)
@@ -29,16 +29,16 @@ GrysNet is a neural network package that allows researchers to train custom mode
 <a name="Installation"></a>
 ## Installation
 
-CrysNet can be installed easily through anaconda! As follows:
+MatDGL can be installed easily through anaconda! As follows:
 
-+ Create a new conda environment named "crysnet" by command, then activate environment "crysnet":    
++ Create a new conda environment named "matdgl" by command, then activate environment "matdgl":    
     ```bash
-    conda create -n crysnet python=3.8  
-    conda activate crysnet 
+    conda create -n matdgl python=3.8  
+    conda activate matdgl 
     ```  
    It's necessary to create a new conda environment to aviod bugs causing by version conflict.   
  
-+ Configure dependencies of crysnet:
++ Configure dependencies of matdgl:
     ```bash
     conda install -c conda-forge tensorflow-gpu==2.6.0
     ```
@@ -56,17 +56,17 @@ CrysNet can be installed easily through anaconda! As follows:
     conda install --channel conda-forge sklearn
     ```   
 
-+ Install crysnet:  
++ Install matdgl:  
     ```bash
-    pip install crysnet  
+    pip install matdgl  
     ```  
   
 
 <a name="Usage"></a>
 ## Usage
 ### Quick start
-CrysNet is very easy to use!  
-Just ***three steps*** can finish a fast test using crysnet:
+MatDGL is very easy to use!  
+Just ***three steps*** can finish a fast test using matdgl:
 + **download test data**  
 Get test datas from https://github.com/huzongxiang/CrystalNetwork/tree/main/datas/    
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
@@ -80,7 +80,7 @@ run command:
 You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in /results and /models, respectively.  
 
 ### Understanding trainning script  
-You can use crysnet by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!   
+You can use matdgl by provided trainning scripts in user_easy_trainscript only, but understanding script will help you custom your trainning task!   
      
 + **get datas**  
 Get current work directory of running trainning script, the script will read datas from 'workdir/datas/' , then saves results and models to 'workdir/results/' and 'workdir/models/'  
@@ -92,7 +92,7 @@ Get current work directory of running trainning script, the script will read dat
 + **fed trainning datas**   
 Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' defines regression/classification/multi-classification, 'data_path' gets path of trainning datas.  
 	```python
-	from crysnet.data import Dataset
+	from matdgl.data import Dataset
 	dataset = Dataset(task_type='multiclassfication', data_path=ModulePath)
 	```  
 
@@ -100,7 +100,7 @@ Module Dataset will read data from 'ModulePath/datas/dataset.json', 'task_type' 
 Module GraphGenerator feds datas into model during trainning. The Module splits datas into train, valid, test sets, and transform structures data into labelled graphs and gets three generators.
 BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas your used in entire datas, CUTOFF is cutoff of graph edges in crystal.   
 	```python
-	from crysnet.data.generator import GraphGenerator
+	from matdgl.data.generator import GraphGenerator
 	BATCH_SIZE = 128
 	DATA_SIZE = None
 	CUTOFF = 2.5
@@ -114,10 +114,10 @@ BATCH_SIZE is batch size during trainning, DATA_SIZE defines number of datas you
 	```  
 
 + **building model**  
-Module GNN defines a trainning framework that accepts a series of models. Crysnet provides a series of mainstream models as your need.  
+Module GNN defines a trainning framework that accepts a series of models. MatDGL provides a series of mainstream models as your need.  
 	```python
-	from crysnet.models import GNN
-	from crysnet.models.gnnmodel import MpnnBaseModel, TransformerBaseModel, CgcnnModel, GraphAttentionModel
+	from matdgl.models import GNN
+	from matdgl.models.gnnmodel import MpnnBaseModel, TransformerBaseModel, CgcnnModel, GraphAttentionModel
 
 	gnn = GNN(model=MpnnBaseModel,
 		atom_dim=16
@@ -170,7 +170,7 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
 		structures.append(Structure.from_file(cif))    # for POSCAR too
 
 	# construct your dataset
-	from crysnet.data import Dataset
+	from matdgl.data import Dataset
 	dataset = Dataset(task_type='my_classification', data_path=ModulePath)  # task_type could be my_regression, my_classification, my_multiclassification
 	dataset.prepare_x(structures)
 	dataset.prepare_y(labels)   # if you have labels used to trainning model, labels could be None in prediction on new datas without labels
@@ -188,11 +188,11 @@ If you have your structures (and labels), the Dataset receives pymatgen.core.Str
 	multiclassification = Generators.multiclassification  # multiclassification = 5
 	```
 
-+ **models provided by crysnet**  
++ **models provided by matdgl**  
  We provide GraphModel, MpnnBaseModel, TransformerBaseModel, MpnnModel, TransformerModel, DirectionalMpnnModel, DirectionalTransformerModel and CGCNN model according to your demends. TransformerModel, GraphModel and MpnnModel are different models. TransformerModel is a graph transformer. MpnnModel is a massege passing neural network. GraphModel is a combination of TransformerModel and MpnnModel. MpnnBaseModel and TransformerBaseModel don't take directional informations of crystal into count so them run faster. MpnnBaseModel is the fastest model but accuracy is enough for most tasks. TransformerModel can achieve the hightest accuracy in most tasks. The CGCNN model is the crystal graph convolution neural network model. The GraphAttentionModel is the graph attention neural network.  
 	```python
-	from crysnet.models import GNN
-	from crysnet.models.gnnmodel import MpnnBaseModel, TransformerBaseModel , DirectionalMpnnModel, DirectionalTransformerModel, MpnnModel, TransformerModel, GraphModel, CgcnnModel, GraphAttentionModel
+	from matdgl.models import GNN
+	from matdgl.models.gnnmodel import MpnnBaseModel, TransformerBaseModel , DirectionalMpnnModel, DirectionalTransformerModel, MpnnModel, TransformerModel, GraphModel, CgcnnModel, GraphAttentionModel
 	```
 
 + **custom your model and trainning**  
@@ -200,8 +200,8 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	```python
 	from tensorflow.keras.models import Model
 	from tensorflow.keras import layers
-	from crysnet.layers import MessagePassing
-	from crysnet.layers import PartitionPadding
+	from matdgl.layers import MessagePassing
+	from matdgl.layers import PartitionPadding
 
 	def MyModel(
 		bond_dim,
@@ -251,7 +251,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 		)
 		return model
 
-	from crysnet.models import GNN
+	from matdgl.models import GNN
 	gnn = GNN(model=MyModel,     
 		atom_dim=16,
 		bond_dim=64,
@@ -269,7 +269,7 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	```  
 	You can set edge as your model output.   
 	```python
-	from crysnet.layers import EdgeMessagePassing
+	from matdgl.layers import EdgeMessagePassing
 	def MyModel(
 		bond_dim,
 		atom_dim=16,
@@ -343,9 +343,9 @@ The Module GNN provides a flexible trainning framework to accept tensorflow.kera
 	```  
 
 
-<a name="Crysnet-framework"></a>
+<a name="MatDGL-framework"></a>
 ## Framework  
-CrysNet 
+MatDGL 
 
 
 <a name="Implemented-models"></a>

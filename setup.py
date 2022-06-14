@@ -9,22 +9,22 @@ with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='crysnet',
-    version='0.2.8',
-    description='Labelled Graph Networks for machine learning of crystal.',
+    name='MatDGL',
+    version='0.0.1',
+    description='Material Graph Neural Networks for machine learning of materials.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     author='Zongxiang Hu',
     author_email='huzongxiang@yahoo.com',
-    download_url='https://github.com/huzongxiang/CrystalNetwork/tree/main/crysnet',
+    download_url='https://github.com/huzongxiang/MatDGL/tree/main/matdgl',
     license='BSD',
     install_requires=['numpy', "scikit-learn"],
     packages=find_packages(),
     package_data={
-        "crysnet": ["data/*.json", "models/model/*.hdf5", "*.png"],
+        "matdgl": ["data/*.json", "models/model/*.hdf5", "*.png"],
     },
     include_package_data=True,
-    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing", "topology", "tight", "bingding", "twisted", "graphene"],
+    keywords=["materials", "science", "machine", "learning", "deep", "graph", "networks", "neural", "transformer", "massagepassing"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3.8",
