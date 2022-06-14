@@ -8,6 +8,11 @@ MatDGL.egg-info/dependency_links.txt
 MatDGL.egg-info/requires.txt
 MatDGL.egg-info/top_level.txt
 matdgl/__init__.py
+matdgl.egg-info/PKG-INFO
+matdgl.egg-info/SOURCES.txt
+matdgl.egg-info/dependency_links.txt
+matdgl.egg-info/requires.txt
+matdgl.egg-info/top_level.txt
 matdgl/activations/__init__.py
 matdgl/activations/activations.py
 matdgl/callbacks/__init__.py

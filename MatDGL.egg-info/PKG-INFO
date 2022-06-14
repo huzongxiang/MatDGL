@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: MatDGL
+Name: matdgl
 Version: 0.0.1
 Summary: Material Graph Neural Networks for machine learning of materials.
 Home-page: UNKNOWN
@@ -21,14 +21,14 @@ License-File: LICENSE
 
 ![](https://img.shields.io/badge/license-BSD--2--Clause-green)
 ![](https://img.shields.io/badge/build-passing-brightgreen)
-![](https://img.shields.io/pypi/v/crysnet)
+![](https://img.shields.io/pypi/v/matdgl)
 ![](https://img.shields.io/pypi/dm/crysnet)
 ![](https://img.shields.io/badge/python-3.8-blue)
 ![](https://img.shields.io/badge/tensorflow-2.6.0-red)
-![](https://img.shields.io/github/stars/huzongxiang/CrystalNetwork?style=social)
+![](https://img.shields.io/github/stars/huzongxiang/MatDGL?style=social)
 
 # MatDGL
-MatDGL is a neural network package that allows researchers to train custom models for crystal modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
+MatDGL is a neural network package that allows researchers to train custom models for material modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
 
 ## Table of Contents
 
@@ -89,7 +89,7 @@ MatDGL can be installed easily through anaconda! As follows:
 MatDGL is very easy to use!  
 Just ***three steps*** can finish a fast test using matdgl:
 + **download test data**  
-Get test datas from https://github.com/huzongxiang/CrystalNetwork/tree/main/datas/    
+Get test datas from https://github.com/huzongxiang/MatDGL/tree/main/datas/    
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
