@@ -9,7 +9,7 @@ with open(os.path.join(this_dir, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='MatDGL',
+    name='matdgl',
     version='0.0.1',
     description='Material Graph Neural Networks for machine learning of materials.',
     long_description=long_description,
