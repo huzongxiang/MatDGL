@@ -68,7 +68,7 @@ MatDGL can be installed easily through anaconda! As follows:
 MatDGL is very easy to use!  
 Just ***three steps*** can finish a fast test using matdgl:
 + **download test data**  
-Get test datas from https://github.com/huzongxiang/CrystalNetwork/tree/main/datas/    
+Get test datas from https://github.com/huzongxiang/MatDGL/tree/main/datas/    
 There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
