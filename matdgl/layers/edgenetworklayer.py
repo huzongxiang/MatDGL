@@ -9,7 +9,7 @@ from typing import Sequence
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import activations, initializers, regularizers, constraints
-from crysnet.utils.spherical_harmonics import evaluate_spherical_harmonics
+from matdgl.utils.spherical_harmonics import evaluate_spherical_harmonics
 
 
 class SphericalBasisLayer(layers.Layer):

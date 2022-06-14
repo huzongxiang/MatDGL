@@ -1,12 +1,12 @@
 ![](https://img.shields.io/badge/license-BSD--2--Clause-green)
 ![](https://img.shields.io/badge/build-passing-brightgreen)
 ![](https://img.shields.io/pypi/v/matdgl)
-![](https://img.shields.io/pypi/dm/crysnet)
+![](https://img.shields.io/pypi/dm/matdgl)
 ![](https://img.shields.io/badge/python-3.8-blue)
 ![](https://img.shields.io/badge/tensorflow-2.6.0-red)
 ![](https://img.shields.io/github/stars/huzongxiang/MatDGL?style=social)
 
-# MatDGL
+# MatDGL(Material Deep Graph Learning)
 MatDGL is a neural network package that allows researchers to train custom models for material modeling tasks. It aims to accelerate the research and application of material science. It provides user a series of state-of-the-art models and supports user's innovative researches.
 
 ## Table of Contents

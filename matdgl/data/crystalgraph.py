@@ -14,13 +14,13 @@ from operator import itemgetter
 from multiprocessing import Pool
 import tensorflow as tf
 from tensorflow.keras.utils import Sequence
-from crysnet.utils import Features
+from matdgl.utils import Features
 from typing import Union, Dict, List, Set
 from .embedding import Mendeleev_property, GaussianDistance, MultiPropertyFeatures, Embedding_edges
 from pymatgen.core import Structure
 from pymatgen.analysis.local_env import NearNeighbors, VoronoiNN
-from crysnet.utils.get_nn import get_nn_info
-from crysnet.utils import get_space_group_number
+from matdgl.utils.get_nn import get_nn_info
+from matdgl.utils import get_space_group_number
 
 
 ModulePath = Path(__file__).parent.absolute()

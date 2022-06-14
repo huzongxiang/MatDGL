@@ -8,14 +8,14 @@ Created on Tue Oct 12 20:19:27 2021
 from tensorflow.keras.models import Model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras import layers
-from crysnet.layers import MessagePassing, NewMessagePassing
-from crysnet.layers import SphericalBasisLayer, AzimuthLayer, ConcatLayer, EdgeMessagePassing
-from crysnet.layers import PartitionPadding, PartitionPaddingPair
-from crysnet.layers import EdgesAugmentedLayer, GraphTransformerEncoder
-from crysnet.layers import GNGroverEncoder, ConvGroverEncoder
-from crysnet.layers import GraphAttentionLayer
-from crysnet.layers import CrystalGraphConvolution
-from crysnet.layers import Set2Set
+from matdgl.layers import MessagePassing, NewMessagePassing
+from matdgl.layers import SphericalBasisLayer, AzimuthLayer, ConcatLayer, EdgeMessagePassing
+from matdgl.layers import PartitionPadding, PartitionPaddingPair
+from matdgl.layers import EdgesAugmentedLayer, GraphTransformerEncoder
+from matdgl.layers import GNGroverEncoder, ConvGroverEncoder
+from matdgl.layers import GraphAttentionLayer
+from matdgl.layers import CrystalGraphConvolution
+from matdgl.layers import Set2Set
 
 
 def GraphModel(
