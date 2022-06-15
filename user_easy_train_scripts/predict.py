@@ -11,10 +11,10 @@ import time
 from pathlib import Path
 import numpy as np
 import tensorflow as tf
-from crysnet.data import Dataset
-from crysnet.models import GNN
-from crysnet.data.generator import GraphGenerator, GraphGeneratorPredict
-from crysnet.models.gnnmodel import GraphModel, MpnnModel, TransformerModel
+from matdgl.data import Dataset
+from matdgl.models import GNN
+from matdgl.data.generator import GraphGenerator, GraphGeneratorPredict
+from matdgl.models.gnnmodel import GraphModel, MpnnModel, TransformerModel
 
 
 tf.get_logger().setLevel(logging.ERROR)

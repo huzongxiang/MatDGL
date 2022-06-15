@@ -11,10 +11,10 @@ import logging
 from pathlib import Path
 import numpy as np
 import tensorflow as tf
-from crysnet.data import Dataset
-from crysnet.models import GNN
-from crysnet.data.generator import GraphGenerator
-from crysnet.models.graphmodel import GraphModel, MpnnModel, TransformerModel
+from matdgl.data import Dataset
+from matdgl.models import GNN
+from matdgl.data.generator import GraphGenerator
+from matdgl.models.graphmodel import GraphModel, MpnnModel, TransformerModel
 
 
 tf.get_logger().setLevel(logging.ERROR)
@@ -121,4 +121,5 @@ gnn = GNN(model=TransformerModel,
         regression=regression,
         )
 
-gnn.train(train_data, valid_data, test_data, epochs=600, lr=1e-3, warm_up=True, warmrestart=None, load_weights=True, verbose=1, checkpoints=None)
+gnn.train(train_data, valid_data, test_data, epochs=500, lr=1e-3, warm_up=True, load_weights=False,
+            verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)
