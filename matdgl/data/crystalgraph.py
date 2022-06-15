@@ -14,6 +14,7 @@ from operator import itemgetter
 from multiprocessing import Pool
 import tensorflow as tf
 from tensorflow.keras.utils import Sequence
+from tensorflow.keras.utils import to_categorical
 from matdgl.utils import Features
 from typing import Union, Dict, List, Set
 from .embedding import Mendeleev_property, GaussianDistance, MultiPropertyFeatures, Embedding_edges
@@ -461,15 +462,16 @@ class LabelledCrystalGraph(LabelledCrystalGraphBase):
     
     
 class  GraphBatchGeneratorSequence(Sequence):   
+    
     def __init__(self, atom_features_list: List[np.ndarray],
                 bond_features_list: List[np.ndarray],
                 local_env_list: List[np.ndarray],
                 state_attrs_list: List[np.ndarray],
                 pair_indices_list: List[np.ndarray],
                 labels: Union[List, None]=None,
-                task_type=None,
-                batch_size=32,
-                is_shuffle=False):
+                task_type: Union[str, None]=None,
+                batch_size: int=32,
+                is_shuffle: bool=False):
         """
         Parameters
         ----------
@@ -478,7 +480,7 @@ class  GraphBatchGeneratorSequence(Sequence):
         y_label : TYPE
             DESCRIPTION.
         batch_size : TYPE, optional
-            DESCRIPTION. The default is 64.
+            DESCRIPTION. The default is 32.
         is_shuffle : TYPE, optional
             DESCRIPTION. The default is False.
 
@@ -635,7 +637,192 @@ class  GraphBatchGeneratorSequence(Sequence):
                 bond_graph_indices, pair_indices_per_graph)
 
 
-class  GraphBatchGeneratorFromGraphs(GraphBatchGeneratorSequence):     
+class  GraphBatchGeneratorMasking(GraphBatchGeneratorSequence):
+
+    def __init__(self,
+                atom_features_list: List[np.ndarray],
+                bond_features_list: List[np.ndarray],
+                local_env_list: List[np.ndarray],
+                state_attrs_list: List[np.ndarray],
+                pair_indices_list: List[np.ndarray],
+                labels: Union[List, None]=None,
+                task_type: Union[str, None]=None,
+                batch_size: int=32,
+                is_shuffle: bool=False,
+                masking_percent: float=0.15,
+                masking: int=119):
+        """
+        Parameters
+        ----------
+        X_tensor : TYPE
+            DESCRIPTION.
+        y_label : TYPE
+            DESCRIPTION.
+        batch_size : TYPE, optional
+            DESCRIPTION. The default is 32.
+        is_shuffle : TYPE, optional
+            DESCRIPTION. The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        self.masking_percent = masking_percent
+        self.masking = masking
+        super().__init__(atom_features_list,
+                bond_features_list,
+                local_env_list,
+                state_attrs_list,
+                pair_indices_list,
+                labels,
+                task_type,
+                batch_size,
+                is_shuffle)
+
+
+    def _random_masking(self, feature_list: List[np.array]) -> tuple:
+        """
+        Random select atoms masking and return label for masking atoms.
+        ----------
+        x_batch : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        x_batch : TYPE
+            DESCRIPTION.
+        y_label : TYPE
+            DESCRIPTION.
+
+        """
+        
+        masking_indices = []
+        masking_node_labels = []
+        for features in feature_list:
+            indices = np.random.choice(np.arange(features.size), replace=False,
+                           size=int(features.size * self.masking_percent))
+            masking_indices.append(indices)
+            masking_node_labels.append(features[indices])
+            features[indices] = self.masking
+        
+        masking_indices = masking_indices
+        masking_node_labels = to_categorical(np.concatenate(masking_node_labels, axis=0), self.masking)
+
+        return feature_list, masking_indices, masking_node_labels
+
+
+    def __getitem__(self, index: int) -> tuple:
+        batch_index = self.total_index[index * self.batch_size : (index + 1) * self.batch_size]
+        get = itemgetter(*batch_index)
+
+        atom_features_list = get(self.atom_features_list)
+        bond_features_list = get(self.bond_features_list)
+        local_env_list =  get(self.local_env_list)
+        state_attrs_list = get(self.state_attrs_list)
+        pair_indices_list = get(self.pair_indices_list)
+
+        # random masking atoms of a graph in the batch
+        atom_features_list, masking_indices_list, masking_node_labels = self._random_masking(atom_features_list)
+
+        inputs_batch = (atom_features_list,
+                        bond_features_list,
+                        local_env_list,
+                        state_attrs_list,
+                        pair_indices_list,
+                        masking_indices_list,
+                        )
+
+        x_batch = self._merge_batch(inputs_batch)
+
+        return x_batch, (masking_node_labels)
+
+
+    def _merge_batch(self, x_batch: tuple) -> tuple:
+        """
+        Merging a batch of graphs into a disconnected graph should reindex atoms only
+        features of graphs desn't be changed only merge them to one dimension of globl graph.
+        reindex indices in pair_indices by adding increment of number of atoms in the batch
+        atom marked with structure indice also need to be tell in globl graph.
+        Parameters
+        ----------
+        x_batch : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        atom_features : TYPE
+            DESCRIPTION.
+        bond_features : TYPE
+            DESCRIPTION.
+        state_attributes : TYPE
+            DESCRIPTION.
+        pair_indices : TYPE
+            DESCRIPTION.
+        atom_partition_indices: TYPE
+            DESCRIPTION.
+        bond_partition_indices: TYPE
+            DESCRIPTION.
+        """
+        atom_features, bond_features, local_env, state_attrs, pair_indices, masking_indices = x_batch
+    
+        # Obtain number of atoms and bonds for each graph
+        # allocate graph (structure) indice for atom and bond in global graph
+        num_atoms_per_graph = []
+        atom_graph_indices = []
+        for i, atoms in enumerate(atom_features):
+            num = len(atoms)
+            num_atoms_per_graph.append(num)
+            atom_graph_indices += [i] * num
+
+        atom_graph_indices = np.array(atom_graph_indices)
+
+        num_bonds_per_graph = []
+        bond_graph_indices = []
+        for i, bonds in enumerate(bond_features):
+            num = len(bonds)
+            num_bonds_per_graph.append(num)
+            bond_graph_indices += [i] * num
+
+        bond_graph_indices = np.array(bond_graph_indices)
+    
+        num_masking_per_graph = []
+        masking_graph_indices = []
+        for i, indices in enumerate(masking_indices):
+            num = len(indices)
+            num_masking_per_graph.append(num)
+            masking_graph_indices += [i] * num
+
+        masking_graph_indices = np.array(masking_graph_indices)
+
+        # Increment is accumulative number of atom of each graph, it is used to reindex
+        # indices of atom in global graph, so it should be adding to pair indices apart
+        # from the first graph. The first subgraph keep its atom indices in global graph.
+        # In order to add increment to pair indices, each accumulative number in increment
+        # should be repeat num_bonds times so that every indice in pair_indices
+        # accumulative number for first graph is zeros so that should pad num_bonds of zero to increment.
+        increment = np.cumsum(num_atoms_per_graph[:-1])
+
+        increment = np.pad(
+            np.repeat(increment, num_bonds_per_graph[1:]), [(num_bonds_per_graph[0], 0)])
+        
+        pair_indices_per_graph = np.concatenate(pair_indices, axis=0)
+        pair_indices = pair_indices_per_graph + np.expand_dims(increment, axis=-1)
+
+        atom_features = np.concatenate(atom_features, axis=0)
+        bond_features = np.concatenate(bond_features, axis=0)
+        state_attrs = np.concatenate(state_attrs, axis=0)
+        masking_indices = np.concatenate(masking_indices, axis=0)
+        
+        # Local spherical theta phi used for EdgeNetworks, the same as NodeNetworks.      
+        local_env = np.concatenate(local_env, axis=0)
+    
+        return (atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
+                bond_graph_indices, pair_indices_per_graph, masking_indices, masking_graph_indices)
+
+
+class  GraphBatchGeneratorFromGraphs(GraphBatchGeneratorSequence):
+
     def __init__(self, graphs: List, labels: Union[List, None], task_type, batch_size=32):
         self.graphs = graphs
         self.labels = labels
@@ -793,11 +980,6 @@ class  GraphBatchGeneratorBase:
         state_attrs = state_attrs.merge_dims(outer_axis=0, inner_axis=1)
         
         # Local spherical theta phi used for EdgeNetworks, the same as NodeNetworks.
-        # num_edges_per_graph = local_env.row_lengths()
-        # edge_graph_indices = tf.repeat(graph_indices, num_edges_per_graph)
-        # increment_edges = tf.cumsum(num_bonds_per_graph[:-1])
-        # increment_edges = tf.pad(
-        #     tf.repeat(increment_edges, num_edges_per_graph[1:]), [(num_edges_per_graph[0], 0)])
         
         local_env = local_env.merge_dims(outer_axis=0, inner_axis=1).to_tensor()
     

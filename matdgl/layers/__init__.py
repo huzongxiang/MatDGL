@@ -13,4 +13,4 @@ from .graphormer import GraphormerEncoder, ConvGraphormerEncoder
 from .graphattentionlayer import GraphAttentionLayer
 from .grover import GNGroverEncoder, ConvGroverEncoder
 from .partitionpaddinglayer import PartitionPadding, PartitionPaddingPair
-from .readout import Set2Set
+from .readout import Set2Set, LinearPredMasking

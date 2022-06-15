@@ -23,6 +23,107 @@ from sklearn.metrics import auc, r2_score
 ModulePath = Path(__file__).parent.absolute()
 
 
+class Pretrainer:
+    def __init__(self,
+        model: Model,
+        atom_dim=16,
+        bond_dim=32,
+        num_atom=118,
+        state_dim=16,
+        sp_dim=230,
+        batch_size=16,
+        ntarget=1,
+        optimizer='Adam',
+        **kwargs,
+        ):
+        self.model = model
+        self.atom_dim = atom_dim
+        self.bond_dim = bond_dim
+        self.num_atom = num_atom
+        self.state_dim = state_dim
+        self.sp_dim = sp_dim
+        self.batch_size = batch_size
+        self.ntarget = ntarget
+        self.optimizer = optimizer
+
+        self.gnn = model(atom_dim=atom_dim,
+        bond_dim=bond_dim,
+        num_atom=num_atom,
+        state_dim=state_dim,
+        sp_dim=sp_dim,
+        batch_size=batch_size,
+        **kwargs)
+
+
+    def __getattr__(self, attr):
+        return getattr(self.gnn, attr)
+
+
+    def train(self, train_data, valid_data=None, test_data=None, epochs=200, lr=1e-3, warm_up=True, warmrestart=None,
+                load_weights=False, patience=500, verbose=1, checkpoints=None, save_weights_only=True, workdir=None):
+
+        gnn = self.gnn
+        gnn.compile(
+            loss=tf.keras.losses.CategoricalCrossentropy(),
+            optimizer=self.optimizer,
+            metrics=[tf.keras.metrics.AUC(name="AUC")],
+        )
+
+        Path(workdir/"pretrained").mkdir(exist_ok=True)
+
+        if checkpoints is None:
+            filepath = Path(workdir/"model"/train_data.task_type/"gnn_{epoch:02d}-{val_AUC:.3f}.hdf5")
+            checkpoint = ModelCheckpoint(filepath, monitor='val_AUC', save_best_only=True, save_weights_only=save_weights_only, verbose=verbose, mode='max')
+            earlystop = EarlyStopping(monitor='val_loss', patience=patience, verbose=verbose, mode='min')
+
+            if warm_up:
+                sample_count = train_data.data_size
+                warmup_epoch = 5
+                train_per_epoch = sample_count / self.batch_size
+                warmup_steps = warmup_epoch * train_per_epoch
+                restart_epoches = warmrestart
+
+                warm_up_lr = WarmUpCosineDecayScheduler(epochs=epochs,
+                                                        restart_epoches=restart_epoches,
+                                                        train_per_epoch=train_per_epoch,
+                                                        learning_rate_base=lr,
+                                                        warmup_learning_rate=2e-6,
+                                                        warmup_steps=warmup_steps,
+                                                        hold_base_rate_steps=5,
+                                                        )
+
+                checkpoints = [checkpoint, warm_up_lr, earlystop]
+            else:
+                reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=50, verbose=1, min_lr=1e-6, mode='min')
+                checkpoints = [checkpoint, reduce_lr, earlystop]
+
+
+        if valid_data:
+            steps_per_train = int(np.ceil(train_data.data_size / self.batch_size))
+            steps_per_val = int(np.ceil(valid_data.data_size / self.batch_size))
+        else:
+            steps_per_train = None
+            steps_per_val = None
+
+        print("gnn fit")
+        history = gnn.fit(
+            train_data,
+            validation_data=valid_data,
+            steps_per_epoch=steps_per_train,
+            validation_steps=steps_per_val,
+            epochs=epochs,
+            verbose=verbose,
+            callbacks=checkpoints,
+            )
+
+        Path(workdir/"results").mkdir(exist_ok=True)
+        plot_train(history, train_data.task_type, workdir)
+
+        if warm_up:
+            total_steps = int(epochs * sample_count / self.batch_size)
+            plot_warm_up_lr(warm_up_lr, total_steps, lr, workdir)       
+
+
 class GNN:
     def __init__(self,
         model: Model,

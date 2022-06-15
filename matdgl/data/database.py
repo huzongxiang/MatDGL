@@ -10,6 +10,7 @@ Created on Thu Jun  3 14:56:51 2021
 import os
 import json
 import pickle
+from regex import R
 import requests
 from asyncore import write
 from tqdm import tqdm
@@ -25,12 +26,21 @@ np.random.seed(42)
 
 class Dataset:
     """
-    Accessing materialsproject.org by api.
+    Dataset
     """
-    def __init__(self, task_type=None, data_path=None, predict=False, api_key=None):
-        if task_type not in ['my_regression', 'my_classification', 'my_multiclassification', 'metal', 'band_gap', 'dos_fermi', 'formation_energy', 'formation_energy_all', 'formation_energy', 'e_above_hull', 'topology', 'topology_multi', 'GVRH', 'KVRH', 'possion_ratio', 'regression', 'classification', 'multiclassification']:
-            raise ValueError('Invalid task type! Input task_type should be my_regression, my_classification, my_multiclassification, regression, classification, multiclassification, metal, band_gap, dos_fermi, formation_energy, e_above_hull, formation_energy_all, formation_energy, topology, GVRH, KVRH, possion_ratio.')
+    def __init__(self, task_type=None, data_path=None, predict=False, api_key=None, ratio=[0.7, 0.9]):
+        if task_type not in ['my_regression', 'my_classification', 'my_multiclassification', 'metal', 'band_gap', 'dos_fermi',\
+                    'formation_energy', 'formation_energy_all', 'formation_energy', 'e_above_hull', 'topology', 'topology_multi', 'GVRH',\
+                    'KVRH', 'possion_ratio', 'regression', 'classification', 'multiclassification', 'pretrainning']:
+            raise ValueError('Invalid task type! Input task_type should be pretrainning, my_regression, my_classification, my_multiclassification,\
+                            regression, classification, multiclassification, metal, band_gap, dos_fermi, formation_energy, e_above_hull,\
+                            formation_energy_all, formation_energy, topology, GVRH, KVRH, possion_ratio.')
         
+        if len(ratio) == 2 and ratio[1] > ratio[0]:
+            self.ratio = ratio
+        else:
+            raise ValueError("Invalid ratio, ratio should be list like [0.7, 0.9]")
+
         self.task_type = task_type
         self.multiclassification = False
         
@@ -86,6 +96,10 @@ class Dataset:
             self.regression = False
         elif task_type == 'my_multiclassification':
             self.dataset_file = Path(data_path/"datas"/"dataset_mym.json")
+            self.regression = False
+            self.multiclassification = True
+        elif task_type == 'pretrainning':
+            self.dataset_file = Path(data_path/"datas"/"dataset_pretrain.json")
             self.regression = False
             self.multiclassification = True
         
@@ -202,53 +216,67 @@ class Dataset:
     def prepare_train_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
-        if labels:
-            self.labels = labels
         if permutation is not None:
            self.permuted_indices = permutation 
 
-        train_index = self.permuted_indices[: int(len(self.permuted_indices) * 0.7)]
+        train_index = self.permuted_indices[: int(len(self.permuted_indices) * self.ratio[0])]
+
         x_train = []
-        y_train = []
-        for index in train_index:
-            x_train.append(self.structures[index])
-            y_train.append(self.labels[index])
-        return x_train, y_train
+        if labels:
+            self.labels = labels
+            y_train = []
+            for index in train_index:
+                x_train.append(self.structures[index])
+                y_train.append(self.labels[index])
+            return x_train, y_train
+        else:
+            for index in train_index:
+                x_train.append(self.structures[index])
+            return x_train, y_train           
 
 
     def prepare_validate_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
-        if labels:
-            self.labels = labels
         if permutation is not None:
            self.permuted_indices = permutation 
 
-        valid_index = self.permuted_indices[int(len(self.permuted_indices) * 0.7) : int(len(self.permuted_indices) * 0.9)]
+        valid_index = self.permuted_indices[int(len(self.permuted_indices) * self.ratio[0]) : int(len(self.permuted_indices) * self.ratio[1])]
+
         x_valid = []
-        y_valid = []
-        for index in valid_index:
-            x_valid.append(self.structures[index])
-            y_valid.append(self.labels[index])
-        return x_valid, y_valid
+        if labels:
+            self.labels = labels
+            y_valid = []
+            for index in valid_index:
+                x_valid.append(self.structures[index])
+                y_valid.append(self.labels[index])
+            return x_valid, y_valid
+        else:
+            for index in valid_index:
+                x_valid.append(self.structures[index])
+            return x_valid          
 
 
     def prepare_test_set(self, structures: List, labels: List=None, permutation=None) -> List:
         if structures:
             self.structures = structures
-        if labels:
-            self.labels = labels
         if permutation is not None:
            self.permuted_indices = permutation 
 
-        # test_index = self.permuted_indices
-        test_index = self.permuted_indices[int(len(self.permuted_indices) * 0.9) :]
+        test_index = self.permuted_indices[int(len(self.permuted_indices) * self.ratio[1]) :]
+
         x_test = []
-        y_test = []
-        for index in test_index:
-            x_test.append(self.structures[index])
-            y_test.append(self.labels[index])
-        return x_test, y_test
+        if labels:
+            self.labels = labels
+            y_test = []
+            for index in test_index:
+                x_test.append(self.structures[index])
+                y_test.append(self.labels[index])
+            return x_test, y_test
+        else:
+            for index in test_index:
+                x_test.append(self.structures[index])
+            return x_test      
 
 
     def prepare_x(self, structures: List) -> List:

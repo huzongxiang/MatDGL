@@ -5,8 +5,9 @@ Created on Tue Dec 14 14:12:08 2021
 @author: huzongxiang
 """
 
+from cProfile import label
 from tensorflow.keras.utils import to_categorical
-from .crystalgraph import LabelledCrystalGraph, GraphBatchGeneratorSequence
+from .crystalgraph import LabelledCrystalGraph, GraphBatchGeneratorSequence, GraphBatchGeneratorMasking
 
 
 class GraphGenerator:
@@ -33,16 +34,16 @@ class GraphGenerator:
             num = self.data_size
             structures_used = structures[:num]
             labels_used = labels[:num]
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
             permutation = self.dataset.permute_indices(num)
         else:
             structures_used = structures
             labels_used = labels
             self.data_size = len(labels_used)
-            labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
-            permutation = self.dataset.permute_indices(len(labels_used))
+            permutation = self.dataset.permute_indices(len(structures_used))
 
-        print('prepare datasets, 70% for train, 20% for valid, 10% for test.')
+        labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
+
+        print('prepare datasets, default 70% for train, 20% for valid, 10% for test.')
         print('preparing train dataset...')
         x_train_, y_train = self.dataset.prepare_train_set(structures_used, labels_used, permutation)
         x_train = labelledgraph.inputs_from_strcutre_list(x_train_)
@@ -68,6 +69,54 @@ class GraphGenerator:
         train_data = GraphBatchGeneratorSequence(*x_train, y_train, task_type, batch_size=self.batch_size)
         valid_data = GraphBatchGeneratorSequence(*x_valid, y_valid, task_type, batch_size=self.batch_size)
         test_data = GraphBatchGeneratorSequence(*x_test, y_test, task_type, batch_size=self.batch_size)
+
+        return train_data, valid_data, test_data
+
+
+class GraphGeneratorMasking:
+    
+    def __init__(self, dataset, data_size=None, batch_size=16, cutoff=3.0, mendeleev=False):
+        self.dataset = dataset
+        self.data_size = data_size
+        self.batch_size = batch_size
+        self.cutoff = cutoff
+        self.mendeleev = mendeleev
+
+        self.masking_generator = self.generators()
+
+
+    def generators(self):
+        structures = self.dataset.structures
+        task_type = self.dataset.task_type
+
+        if self.data_size:
+            num = self.data_size
+            structures_used = structures[:num]
+            permutation = self.dataset.permute_indices(num)
+        else:
+            structures_used = structures
+            self.data_size = len(structures_used)
+            permutation = self.dataset.permute_indices(len(structures_used))
+
+        labels_used = None
+        labelledgraph = LabelledCrystalGraph(cutoff=self.cutoff, mendeleev=self.mendeleev)
+
+        print('prepare datasets, default 70% for train, 20% for valid, 10% for test.')
+        print('preparing train dataset...')
+        x_train_ = self.dataset.prepare_train_set(structures_used, labels_used, permutation)
+        x_train = labelledgraph.inputs_from_strcutre_list(x_train_)
+
+        print('preparing valid dataset...')
+        x_valid_ = self.dataset.prepare_validate_set(structures_used, labels_used, permutation)
+        x_valid = labelledgraph.inputs_from_strcutre_list(x_valid_)
+
+        print('preparing test dataset...')
+        x_test_ = self.dataset.prepare_test_set(structures_used, labels_used, permutation)
+        x_test = labelledgraph.inputs_from_strcutre_list(x_test_)
+
+        train_data = GraphBatchGeneratorMasking(*x_train, task_type=task_type, batch_size=self.batch_size)
+        valid_data = GraphBatchGeneratorMasking(*x_valid, task_type=task_type, batch_size=self.batch_size)
+        test_data = GraphBatchGeneratorMasking(*x_test, task_type=task_type, batch_size=self.batch_size)
 
         return train_data, valid_data, test_data
 

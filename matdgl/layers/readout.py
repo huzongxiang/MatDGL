@@ -184,5 +184,53 @@ class TransformerEncoder(layers.Layer):
         attention_output = self.attention(inputs, inputs, attention_mask=attention_mask)
         proj_input = self.layernorm_1(inputs + attention_output)
         return self.layernorm_2(proj_input + self.dense_proj(proj_input))
+
+
+class LinearPredMasking(layers.Layer):
+    def __init__(self,
+                kernel_initializer="glorot_uniform",
+                kernel_regularizer=None,
+                kernel_constraint=None,
+                use_bias=True,
+                bias_initializer="zeros",
+                bias_regularizer=None,
+                bias_constraint=None,
+                **kwargs):
+        super().__init__(**kwargs)
+        self.kernel_initializer = kernel_initializer
+        self.kernel_regularizer = kernel_regularizer
+        self.kernel_constraint = kernel_constraint
+        self.use_bias = use_bias
+        self.bias_initializer = bias_initializer
+        self.bias_regularizer = bias_regularizer
+        self.bias_constraint = bias_constraint
+
+
+    def build(self, inputs):
+
+        self.dense = layers.Dense(
+            units=119,
+            use_bias=self.use_bias,
+            kernel_initializer=self.kernel_initializer,
+            kernel_regularizer=self.kernel_regularizer,
+            kernel_constraint=self.kernel_constraint,
+            bias_initializer=self.bias_initializer,
+            bias_regularizer=self.bias_regularizer,
+            bias_constraint=self.bias_constraint,
+            activation="softmax",
+            name='dense',
+            )
     
-    
+
+    def gather(self, features_list, masking_indices, masking_graph_indices):
+        indices = tf.stack([masking_graph_indices, masking_indices], axis=1)
+        features = tf.gather_nd(features_list, indices)
+        return features
+        
+
+    def call(self, inputs):
+        features_list, masking_indices, masking_graph_indices = inputs
+        features = self.gather(features_list, masking_indices, masking_graph_indices)
+        features_batch = self.dense(features)
+
+        return features_batch
