@@ -30,9 +30,11 @@ matdgl/layers/mpnntransformer.py
 matdgl/layers/partitionpaddinglayer.py
 matdgl/layers/readout.py
 matdgl/models/__init__.py
-matdgl/models/gnnframework.py
+matdgl/models/distframe.py
+matdgl/models/gnnframe.py
 matdgl/models/gnnmodel.py
 matdgl/models/graphmodel.py
+matdgl/models/pretrainer.py
 matdgl/models/model/band_gap.hdf5
 matdgl/models/model/formation_energy.hdf5
 matdgl/models/model/metal.hdf5

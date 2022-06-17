@@ -5,6 +5,7 @@ Created on Wed Jun 15 15:14:40 2022
 @author: huzongxiang
 """
 
+from typing import final
 from tensorflow.keras.models import Model
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras import layers
@@ -26,17 +27,14 @@ def TransformerModel(
         sp_dim=230,
         units=32,
         edge_steps=1,
-        message_steps=1,
         transform_steps=1,
         num_attention_heads=8,
         dense_units=32,
-        output_dim=32,
-        readout_units=128,
-        dropout=0.0,
         reg0=0.0,
         reg1=0.0,
         batch_size=16,
         spherical_harmonics=False,
+        final_dim=119,
         ):
         atom_features = layers.Input((), dtype="int32", name="atom_features_input")
         atom_features_ = layers.Embedding(num_atom, atom_dim, dtype="float32", name="atom_features")(atom_features)
@@ -92,7 +90,7 @@ def TransformerModel(
                 kernel_regularizer=l2(reg1),
                 )([x_nodes, edges_matrixs])
 
-        x = LinearPredMasking()([x_nodes, masking_indices, masking_graph_indices])
+        x = LinearPredMasking(units=final_dim)([x_nodes, masking_indices, masking_graph_indices])
 
         model = Model(
             inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,

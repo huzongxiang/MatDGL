@@ -5,6 +5,9 @@ Created on Tue Oct 12 20:15:01 2021
 @author: huzongxiang
 """
 
+from email.errors import InvalidMultipartContentTransferEncodingDefect
+from pyexpat import features
+from xml.sax.xmlreader import InputSource
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -128,12 +131,12 @@ class Set2Set(layers.Layer):
             # print('q:',q.shape)
             # e_i,t = scalar(m_i,q_t)
             e = tf.einsum('ijk,ilk->ijl', features, q) 
-            # print('e:',e.shape)
-            # calculate a_i,t by softmax ei,t
+            # print('e:', e.shape)
+            # calculate a_i, t by softmax ei, t
             a = tf.nn.softmax(e, axis=1)  
             a = tf.tile(a, [1, 1, self.output_dim]) 
-            # print(a.shape,features.shape)
-            # calculated r_t by sum a_i,t and m_i
+            # print(a.shape, features.shape)
+            # calculated r_t by sum a_i, t and m_i
             r = tf.reduce_sum(tf.multiply(a, features), axis=1, keepdims=True)  
             q_star = tf.concat([q, r], -1)  
 
@@ -188,6 +191,7 @@ class TransformerEncoder(layers.Layer):
 
 class LinearPredMasking(layers.Layer):
     def __init__(self,
+                units=119,
                 kernel_initializer="glorot_uniform",
                 kernel_regularizer=None,
                 kernel_constraint=None,
@@ -197,6 +201,7 @@ class LinearPredMasking(layers.Layer):
                 bias_constraint=None,
                 **kwargs):
         super().__init__(**kwargs)
+        self.units = units
         self.kernel_initializer = kernel_initializer
         self.kernel_regularizer = kernel_regularizer
         self.kernel_constraint = kernel_constraint
@@ -209,7 +214,7 @@ class LinearPredMasking(layers.Layer):
     def build(self, inputs):
 
         self.dense = layers.Dense(
-            units=119,
+            units=self.units,
             use_bias=self.use_bias,
             kernel_initializer=self.kernel_initializer,
             kernel_regularizer=self.kernel_regularizer,
@@ -223,6 +228,10 @@ class LinearPredMasking(layers.Layer):
     
 
     def gather(self, features_list, masking_indices, masking_graph_indices):
+        # using masking_graph_indice indexes the masking_indice in the batch
+        # tf.stack index in form list [[0, 1], [0, 2], [1, 0], [1, 2], [1, 3] ...]
+        # the "0" in [0, 1] indicates index in first dim, "1" indicates index in second dim
+        # so tf.gather_nd first select 1st dim then select 2st dim through all indexes in the list
         indices = tf.stack([masking_graph_indices, masking_indices], axis=1)
         features = tf.gather_nd(features_list, indices)
         return features

@@ -69,7 +69,20 @@ class Pretrainer:
             metrics=[tf.keras.metrics.AUC(name="AUC")],
         )
 
-        Path(workdir/"pretrained").mkdir(exist_ok=True)
+        if load_weights:
+            print('load weights')
+            path = train_data.task_type + ".hdf5"
+            if load_weights == 'default':
+                best_checkpoint = Path(ModulePath/"model"/path)
+            elif load_weights == 'custom':
+                best_checkpoint = Path(workdir/"model"/path)
+            else:
+                raise ValueError('load_weights should be "default" or "custom"')
+            gnn.load_weights(best_checkpoint)
+
+        print(train_data.task_type)
+        Path(workdir/"model").mkdir(exist_ok=True)
+        Path(workdir/"model"/train_data.task_type).mkdir(exist_ok=True)
 
         if checkpoints is None:
             filepath = Path(workdir/"model"/train_data.task_type/"gnn_{epoch:02d}-{val_AUC:.3f}.hdf5")
@@ -121,7 +134,7 @@ class Pretrainer:
 
         if warm_up:
             total_steps = int(epochs * sample_count / self.batch_size)
-            plot_warm_up_lr(warm_up_lr, total_steps, lr, workdir)       
+            plot_warm_up_lr(warm_up_lr, total_steps, lr, workdir)
 
 
 class GNN:

@@ -22,6 +22,8 @@ class Features(Enum):
     pair_indices = 5
     lattice = 6
     cart_coords = 7
+    masking_indices = 8
+    masking_node_labels = 9
     
     def __int__(self):
         return self.value
