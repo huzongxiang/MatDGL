@@ -69,9 +69,19 @@ MatDGL is very easy to use!
 Just ***three steps*** can finish a fast test using matdgl:
 + **download test data**  
 Get test datas from https://github.com/huzongxiang/MatDGL/tree/main/datas/    
-There are three json files in datas: dataset_classification.json, dataset_multiclassification.json and dataset_regression.json.  
+There are four json files in datas: dataset_classification.json, dataset_multiclassification.json, dataset_regression.json  
+and dataset_pretrain.json.    
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
+```
+work_dir
+│   test.py
+└───datas
+    │   dataset_classification.json
+    │   dataset_multiclassification.json
+    │	dataset_regression.json
+	│   dataset_pretrain.json
+``` 
 + **run command**  
 run command:  
 	```bash
