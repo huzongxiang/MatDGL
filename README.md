@@ -33,8 +33,8 @@ MatDGL can be installed easily through anaconda! As follows:
 
 + Create a new conda environment named "matdgl" by command, then activate environment "matdgl":    
     ```bash
-    conda create -n matdgl python=3.8  
-    conda activate matdgl 
+    conda create -n matdgl python=3.8
+    conda activate matdgl
     ```  
    It's necessary to create a new conda environment to aviod bugs causing by version conflict.   
  
@@ -58,7 +58,7 @@ MatDGL can be installed easily through anaconda! As follows:
 
 + Install matdgl:  
     ```bash
-    pip install matdgl  
+    pip install matdgl
     ```  
   
 
@@ -86,7 +86,7 @@ Download datas and put it in your trainning work directory, test.py file should 
 + **run command**  
 run command:  
 	```bash
-	python test.py  
+	python test.py
 	```  
 You have finished your testing multi-classification trainning! The trainning results and model weight could be saved in /results and /models, respectively.  
 
