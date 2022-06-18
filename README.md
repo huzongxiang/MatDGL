@@ -73,15 +73,16 @@ There are four json files in datas: dataset_classification.json, dataset_multicl
 and dataset_pretrain.json.    
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
-```
-work_dir
-│   test.py
-└───datas
-    │   dataset_classification.json
-    │   dataset_multiclassification.json
-    │	dataset_regression.json
-	│   dataset_pretrain.json
-``` 
+	```
+	work_dir
+	│   test.py
+    |
+	└───datas
+		│   dataset_classification.json
+		│   dataset_multiclassification.json
+		│   dataset_regression.json
+		│   dataset_pretrain.json
+	``` 
 + **run command**  
 run command:  
 	```bash
