@@ -74,7 +74,7 @@ and dataset_pretrain.json.
 + **prepare workdir**  
 Download datas and put it in your trainning work directory, test.py file should also be put in the directory  
 	```
-	work_dir
+	workdir
 	│   test.py
     |
 	└───datas
