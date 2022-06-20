@@ -30,13 +30,16 @@ dataset = Dataset(task_type='pretrainning', data_path=ModulePath, ratio=[0.70, 0
 print('done')
 print(dataset.dataset_file)
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 DATA_SIZE = None
-CUTOFF = 3.3
+CUTOFF = 4.5
 
 # building batch generator for model trainning
 generators = GraphGeneratorMasking(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
 train_data, valid_data = generators()
+
+epochs=50
+lr=1e-4
 
 # default trainning parameters
 atom_dim=16
@@ -74,6 +77,8 @@ print('\n----- parameters -----',
     '\nbatch_size: ', batch_size,
     '\nspherical_harmonics: ', spherical_harmonics,
     '\noptimizer: ', optimizer,
+    '\nepochs: ', epochs,
+    '\nlr :', lr,
     )
 
 del dataset
@@ -98,5 +103,5 @@ gnn = Pretrainer(model=TransformerModel,
         )
 
 # trainning model
-gnn.train(train_data, valid_data, test_data=None, epochs=10, lr=1e-4, warm_up=True,
+gnn.train(train_data, valid_data, test_data=None, epochs=epochs, lr=lr, warm_up=True,
         load_weights=False, verbose=1, checkpoints=None, save_weights_only=True, workdir=ModulePath)

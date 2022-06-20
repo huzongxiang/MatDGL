@@ -30,9 +30,9 @@ dataset = Dataset(task_type='pretrainning', data_path=ModulePath, ratio=[0.70, 0
 print('done')
 print(dataset.dataset_file)
 
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 DATA_SIZE = None
-CUTOFF = 3.0
+CUTOFF = 4.5
 
 # building batch generator for model trainning
 generators = GraphGeneratorMaskingDist(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)

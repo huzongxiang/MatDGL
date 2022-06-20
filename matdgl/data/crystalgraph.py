@@ -856,7 +856,7 @@ class  GraphBatchGeneratorMasking(GraphBatchGeneratorSequence):
         masking_node_labels = []
         for features in feature_list:
             indices = np.random.choice(np.arange(features.size), replace=False,
-                           size=int(features.size * self.masking_percent))
+                           size=int(np.ceil(features.size * self.masking_percent)))
             masking_indices.append(indices)
             masking_node_labels.append(features[indices])
             features[indices] = self.masking

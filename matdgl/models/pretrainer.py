@@ -96,5 +96,6 @@ def TransformerModel(
             inputs=[atom_features, bond_features, local_env, state_attrs, pair_indices, atom_graph_indices,
                     bond_graph_indices, pair_indices_per_graph, masking_indices, masking_graph_indices],
             outputs=[x],
+            name="transformer",
         )
         return model
