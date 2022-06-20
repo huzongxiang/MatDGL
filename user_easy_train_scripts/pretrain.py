@@ -32,7 +32,7 @@ print(dataset.dataset_file)
 
 BATCH_SIZE = 32
 DATA_SIZE = None
-CUTOFF = 2.5
+CUTOFF = 3.3
 
 # building batch generator for model trainning
 generators = GraphGeneratorMasking(dataset, data_size=DATA_SIZE, batch_size=BATCH_SIZE, cutoff=CUTOFF)
@@ -51,7 +51,6 @@ num_attention_heads=8
 dense_units=64
 reg0=0.00
 reg1=0.00
-reg2=0.00
 batch_size=BATCH_SIZE
 spherical_harmonics=True
 optimizer = 'Adam'
@@ -72,7 +71,6 @@ print('\n----- parameters -----',
     '\ndense_units: ', dense_units,
     '\nreg0: ', reg0,
     '\nreg1: ', reg1,
-    '\nreg2: ', reg2,
     '\nbatch_size: ', batch_size,
     '\nspherical_harmonics: ', spherical_harmonics,
     '\noptimizer: ', optimizer,
