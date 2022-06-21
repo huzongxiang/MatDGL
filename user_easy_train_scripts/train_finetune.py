@@ -12,10 +12,10 @@ import time
 from pathlib import Path
 import numpy as np
 import tensorflow as tf
-from crysnet.data import Dataset
-from crysnet.models import Finetune
-from crysnet.data.generator import GraphGenerator
-from crysnet.models.finetune import FinetuneTransformer, FinetuneTransformerRes
+from matdgl.data import Dataset
+from matdgl.models import Finetune
+from matdgl.data.generator import GraphGenerator
+from matdgl.models.finetune import FinetuneTransformer, FinetuneTransformerRes
 
 tf.get_logger().setLevel(logging.ERROR)
 warnings.filterwarnings("ignore")

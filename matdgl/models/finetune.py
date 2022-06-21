@@ -17,7 +17,7 @@ from matdgl.models.pretrainer import TransformerModel
 ModulePath = Path(__file__).parent.absolute()
 
 
-def FinetuneTransformer(state_dim=16,
+def FinetuneTransformerRes(state_dim=16,
                         sp_dim=230,
                         output_dim=32,
                         readout_units=128,
@@ -104,7 +104,7 @@ def FinetuneTransformer(state_dim=16,
     return model
 
 
-def FinetuneTransformer1(state_dim=16,
+def FinetuneTransformer(state_dim=16,
                         sp_dim=230,
                         output_dim=32,
                         readout_units=128,
