@@ -91,7 +91,7 @@ class Dataset:
         elif task_type == 'my_regression':
             self.dataset_file = Path(data_path/"datas"/"dataset_myr.json")
             self.regression = True
-        elif task_type == 'my_classificaiton':
+        elif task_type == 'my_classification':
             self.dataset_file = Path(data_path/"datas"/"dataset_myc.json")
             self.regression = False
         elif task_type == 'my_multiclassification':
