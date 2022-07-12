@@ -181,7 +181,9 @@ class Dataset:
                 dataset.append(structure_label)
         else:
             for structure in structures_dict:
-                dataset.append(structure)            
+                dataset.append(structure)
+
+        self.dataset_file.parent.mkdir(parents=True, exist_ok=True)          
         with open(self.dataset_file,'w') as f:
             json.dump(dataset, f)
             
