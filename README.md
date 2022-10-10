@@ -3,7 +3,7 @@
 ![](https://img.shields.io/pypi/v/matdgl)
 ![](https://img.shields.io/pypi/dm/matdgl)
 ![](https://img.shields.io/badge/python-3.8-blue)
-![](https://img.shields.io/badge/tensorflow-2.6.0-red)
+![](https://img.shields.io/badge/tensorflow-2.10.0-red)
 ![](https://img.shields.io/github/stars/huzongxiang/MatDGL?style=social)
 
 # MatDGL(Material Deep Graph Learning)
@@ -40,7 +40,7 @@ MatDGL can be installed easily through anaconda! As follows:
  
 + Configure dependencies of matdgl:
     ```bash
-    conda install -c conda-forge tensorflow-gpu==2.6.0
+    conda install -c conda-forge tensorflow-gpu
     ```
 
 + Install pymatgen:  
